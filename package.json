@@ -1,0 +1,19 @@
+{
+  "name": "wba2",
+  "version": "1.0.0",
+  "description": "Medieninformatik TH Köln - WBA2 Sommersemester 2018",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker.git"
+  },
+  "author": "Sebastian Faust, Arthur Tissen, Julian Schoemaker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/issues"
+  },
+  "homepage": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker#readme"
+}
