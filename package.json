@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/issues"
   },
-  "homepage": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker#readme"
+  "homepage": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker#readme",
+  "dependencies": {
+    "fs": "0.0.1-security"
+  }
 }
