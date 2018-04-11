@@ -1,18 +1,22 @@
-console.log("Test test");
 
 var fs = require('fs');
 fs.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
     if (err) throw err;
 
-    var staedte = JSON.parse(data);
-    console.log(staedte.cities[0].name);
+    printCities(JSON.parse(data));
+    console.log("JSON Parsed")
+
 });
 
 console.log("Asynchrones sollte hier nach kommen");
 
+/*-----------------Functions--------------------*/
 
-/*
-fs.writeFile(__dirname+"/staedte.json",data ,function(err){
-
-});
-*/
+function printCities(cit) {
+    for(var i = 0; i <= cit.cities.length; i++){
+        console.log("name:          " + cit.cities[i].name);
+        console.log("country:       " + cit.cities[i].country);
+        console.log("population:    " + cit.cities[i].population);
+        console.log("-----------------------------");
+    }
+}
