@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker#readme",
   "dependencies": {
+    "chalk": "^2.3.2",
     "fs": "0.0.1-security"
   }
 }

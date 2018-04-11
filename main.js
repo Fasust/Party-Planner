@@ -1,5 +1,7 @@
 
 var fs = require('fs');
+var chalk = require('chalk');
+
 fs.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
     if (err) throw err;
 
@@ -13,10 +15,10 @@ console.log("Asynchrones sollte hier nach kommen");
 /*-----------------Functions--------------------*/
 
 function printCities(cit) {
-    for(var i = 0; i <= cit.cities.length; i++){
-        console.log("name:          " + cit.cities[i].name);
-        console.log("country:       " + cit.cities[i].country);
-        console.log("population:    " + cit.cities[i].population);
+    for(var i = 0; i < cit.cities.length; i++){
+        console.log(chalk.blue("name:          " + cit.cities[i].name));
+        console.log(chalk.red("country:       " + cit.cities[i].country));
+        console.log(chalk.green("population:    " + cit.cities[i].population));
         console.log("-----------------------------");
     }
 }
