@@ -4,7 +4,7 @@
 var fs = require('fs');
 var chalk = require('chalk');
 
-// function will be executed after reading this file
+// inner functions will be executed after reading this file
 fs.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
     if (err) throw err;
 
