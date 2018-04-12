@@ -12,7 +12,7 @@ Jeder der Vier  soll
 einen Teil besorgen und es soll sichergestellt werden, dass jeder gleich 
 viel bezahlt und zu möglichst wenig unterschiedlichen Läden fahren muss.
 
-#####Funktionen
+##### Funktionen
 * Jeder Benutzer kann Produkte hinzufügen (z.B. Würstchen, Brot, Grillkohle, Ketchup).
 * Die Produkte werden mit Tags von den Benutzern versehen, welche beschreiben, wo das Produkt gekauft werden kann (z.B. Getränkemarkt, Fleischerei).
 * Mehrfache Einträge werden gematched und mit Markierung zusammengefasst.
