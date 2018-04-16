@@ -1,24 +1,38 @@
 /* WBA2 Gruppe Sebastian Faust, Arthur Tissen, Julian Schoemaker */
 
-// load modules
-var fs = require('fs');
-var chalk = require('chalk');
+/************************************************************************
+ * Load Moduls
+ ************************************************************************/
+
+var FS_MOD = require('fs');
+var CHALK_MOD = require('chalk');
+
+
+/************************************************************************
+ * Main
+ ************************************************************************/
 
 // inner functions will be executed after reading this file
-fs.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
+FS_MOD.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
     if (err) throw err;
 
-    // parse the JSON into a javascript object to work with it
-    var citJSON = JSON.parse(data);
+    // parse the ANY-object into a JSON-object to work with it
+    var cit_JSON = JSON.parse(data);
+    var cit_STR;
 
     // sorting function
-    sortCities(citJSON);
+    sortCities(cit_JSON);
+
+    //convert JSON-obj to String
+    cit_STR = JSON.stringify(cit_JSON);
 
     // function will be executed after writing the new JSON file
-    fs.writeFile(__dirname+'/Tasks/staedte_sorted.json', JSON.stringify(citJSON), function(err) {
+    FS_MOD.writeFile(__dirname+'/Tasks/staedte_sorted.json',
+        cit_STR,
+        function(err) {
 
         // display the cities with their name, country and population
-        printCities(citJSON);
+        printCities(cit_JSON);
     });
 
 });
@@ -31,20 +45,27 @@ console.log("\nAsynchrones sollte hier nach kommen:\n\n");
  * Functions
  ************************************************************************/
 
-// print all cities from the object
-function printCities(cit) {
-    for(var i = 0; i < cit.cities.length; i++){
+/**
+ * Prints out City in Console
+ * @param cit_JSON needs cities as JSON-obj
+ */
+function printCities(cit_JSON) {
+    for(var i = 0; i < cit_JSON.cities.length; i++){
         // chalk.<color>() for coloring the font
-        console.log(chalk.blue("name:          " + cit.cities[i].name));
-        console.log(chalk.red("country:       " + cit.cities[i].country));
-        console.log(chalk.green("population:    " + cit.cities[i].population));
+
+        console.log(CHALK_MOD.blue("name:          " + cit_JSON.cities[i].name));
+        console.log(CHALK_MOD.red("country:       " + cit_JSON.cities[i].country));
+        console.log(CHALK_MOD.green("population:    " + formatNumberToGerman(cit_JSON.cities[i].population)));
         console.log("-----------------------------");
     }
 }
 
-// Sorting function - sorted by 'population'
-function sortCities(citJSON) {
-    citJSON.cities.sort(function (a, b) {
+/**
+ * Sorting function - sorted by 'population'
+ * @param cit_JSON cities as JSON-obj
+ */
+function sortCities(cit_JSON) {
+    cit_JSON.cities.sort(function (a, b) {
         if (a.population > b.population) {
             return 1;
         }
@@ -54,4 +75,13 @@ function sortCities(citJSON) {
         // if a is the same as b
         return 0;
     });
+}
+
+/**
+ * Formats number to german number (100000 -> 100.000)
+ * @param numb_INT Number to convert
+ * @returns {string} converted number
+ */
+function formatNumberToGerman(numb_INT) {
+    return numb_INT.toLocaleString('de-DE');
 }
