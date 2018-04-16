@@ -1,7 +1,17 @@
 # WBA2SS18FaustTissenSchoemaker
 ### Medieninformatik TH Köln - WBA2 Sommersemester 2018
 
-## Projekt
+## Projekt Ideen
+
+### Zahlungen in Gruppen
+Die vier Freunde Anna, Basti, Christina und Daniel wollen ein 
+Heimwerksprojekt realisieren. Hierfür fallen kosten an die gleichmäßig 
+auf alle Beteiligten Personen verteilt werden sollen. 
+
+Jede Person übernimmt unterschiedlche Anschaffungen und hat aufgrund 
+dessen am Ende des Projektes unterschiedlich viel bezahlt.
+Anna, Basti, Christina und Daniel würden gerne über das Geld welches 
+sie noch bekommen bzw. noch Schulden benachrichtigt werden.
 
 ### Partyplaner
 Die vier Freunde Anna, Basti, Christina und Daniel wollen eine 
@@ -21,3 +31,4 @@ viel bezahlt und zu möglichst wenig unterschiedlichen Läden fahren muss.
 * Es gibt __einen__ "Veranstalter", der für die Geldzuweisung verantwortlich ist (Durch zentrale Einheit verfällt "Zahlungschaos").
 * Dieser bekommt die Gesamtkosten der Party aufgeführt und welcher Teilnehmer Geld bekommt oder noch zahlen muss.
 * Dann kann dieser das Geld eintreiben und auf die Käufer verteilen.
+
