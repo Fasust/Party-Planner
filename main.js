@@ -1,7 +1,7 @@
 /* WBA2 Gruppe Sebastian Faust, Arthur Tissen, Julian Schoemaker */
 
 /************************************************************************
- * Load Moduls
+ * Load modules
  ************************************************************************/
 
 var FS_MOD = require('fs');
