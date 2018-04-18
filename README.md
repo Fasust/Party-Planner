@@ -17,3 +17,5 @@ einen Teil besorgen und es soll sichergestellt werden, dass möglichst wenig unt
 * Mehrfache Einträge werden gematched und mit Markierung zusammengefasst.
 * Nach Abschluss der Äußerung der Wünsche, werden den Benutzern Einkauforte und damit verbundene Produkte zugewiesen.
 
+##### Externe Services
+* Firebase für Datenbank
