@@ -26,6 +26,12 @@ DB.collection("cities").doc("LA").set({
     country: "USA"
 });
 
+DB.collection("cities").doc("SF").set({
+    name: "San Francisco",
+    state: "CA",
+    country: "USA"
+});
+
 /************************************************************************
  * Functions
  ************************************************************************/
