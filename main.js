@@ -5,19 +5,26 @@
  ************************************************************************/
 
 var FS_MOD = require('fs');
-var admin = require("firebase-admin");
+var ADMIN_MOD = require("firebase-admin");
 
-var serviceAccount = require("/wba2fts-firebase-admin.json");
+var serviceAccount = require("./wba2ftsKey.json");
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+ADMIN_MOD.initializeApp({
+    credential: ADMIN_MOD.credential.cert(serviceAccount),
     databaseURL: "https://wba2fts.firebaseio.com"
 });
+
+var DB = ADMIN_MOD.firestore();
 
 /************************************************************************
  * Main
  ************************************************************************/
 
+DB.collection("cities").doc("LA").set({
+    name: "Los Angeles",
+    state: "CA",
+    country: "USA"
+});
 
 /************************************************************************
  * Functions
