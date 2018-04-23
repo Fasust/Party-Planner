@@ -12,44 +12,40 @@ var CHALK_MOD = require('chalk');
  * Main
  ************************************************************************/
 
+
 // inner functions will be executed after reading this file
-FS_MOD.readFile(__dirname+'/staedte.json', function(err, data) {
+FS_MOD.readFile(__dirname+'/staedte.json', function(err, data1) {
     if (err) throw err;
 
-    FS_MOD.readFile(__dirname+'../Task2/mehr_staedte.json', function(err, data2) {
-        var cit2_JSON = JSON.parse(data2);
-        var cit2_STR;
-
-
+    FS_MOD.readFile(__dirname+ '/../Task2/mehr_staedte.json', function(err, data2) {
         // parse the ANY-object into a JSON-object to work with it
-        var cit_JSON = JSON.parse(data);
+        var cit_JSON = JSON.parse(data1);
         var cit_STR;
 
+        var cit2_JSON = JSON.parse(data2);
+
+        var citComplete_JSON = cit_JSON.cities.concat(cit2_JSON.cities);
+
         // sorting function
-        sortCities(cit_JSON);
+        sortJSONbyParameter(citComplete_JSON,"population");
 
         //convert JSON-obj to String
-        cit_STR = JSON.stringify(cit_JSON);
-    }
+        cit_STR = JSON.stringify(citComplete_JSON);
 
+        // function will be executed after writing the new JSON file
+        FS_MOD.writeFile(__dirname+'/staedte_sorted.json',
+            cit_STR,
+            function(err) {
 
-
-
-
-    // function will be executed after writing the new JSON file
-    FS_MOD.writeFile(__dirname+'/staedte_sorted.json',
-        cit_STR,
-        function(err) {
-
-        // display the cities with their name, country and population
-        printCities(cit_JSON);
+                // display the cities with their name, country and population
+                printCities(citComplete_JSON);
+            });
     });
 
 });
 
 // Check if the asynchronous code is running after reading the whole file
 console.log("\nAsynchrones sollte hier nach kommen:\n\n");
-
 
 /************************************************************************
  * Functions
@@ -60,12 +56,12 @@ console.log("\nAsynchrones sollte hier nach kommen:\n\n");
  * @param cit_JSON needs cities as JSON-obj
  */
 function printCities(cit_JSON) {
-    for(var i = 0; i < cit_JSON.cities.length; i++){
+    for(var i = 0; i < cit_JSON.length; i++){
         // chalk.<color>() for coloring the font
 
-        console.log(CHALK_MOD.blue("name:          " + cit_JSON.cities[i].name));
-        console.log(CHALK_MOD.red("country:       " + cit_JSON.cities[i].country));
-        console.log(CHALK_MOD.green("population:    " + formatNumberToGerman(cit_JSON.cities[i].population)));
+        console.log(CHALK_MOD.blue("name:          " + cit_JSON[i].name));
+        console.log(CHALK_MOD.red("country:       " + cit_JSON[i].country));
+        console.log(CHALK_MOD.green("population:    " + formatNumberToGerman(cit_JSON[i].population)));
         console.log("-----------------------------");
     }
 }
@@ -75,15 +71,16 @@ function combineJSON(a_JSON,b_JSON){
 }
 
 /**
- * Sorting function - sorted by 'population'
- * @param cit_JSON cities as JSON-obj
+ * Sort JSON by KEY Atribute
+ * @param JSON
+ * @param key_STR name of parameter to sort by
  */
-function sortCities(cit_JSON) {
-    cit_JSON.cities.sort(function (a, b) {
-        if (a.population > b.population) {
+function sortJSONbyParameter(JSON,key_STR) {
+    JSON.sort(function (a, b) {
+        if (a[key_STR] > b[key_STR]) {
             return 1;
         }
-        if (a.population < b.population) {
+        if (a[key_STR] < b[key_STR]) {
             return -1;
         }
         // if a is the same as b
