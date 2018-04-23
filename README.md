@@ -1,7 +1,7 @@
 # WBA2SS18FaustTissenSchoemaker
 ### Medieninformatik TH Köln - WBA2 Sommersemester 2018
 
-## Projekt Ideen
+## Projekt Idee
 
 ### Partyplaner
 Die vier Freunde Anna, Basti, Christina und Daniel wollen eine 
@@ -19,3 +19,7 @@ einen Teil besorgen und es soll sichergestellt werden, dass möglichst wenig unt
 
 ##### Externe Services
 * Firebase für Datenbank
+
+### Domänenmodell
+
+![Domänenmodell Partyplaner](Material/dom_modell.jpg)
