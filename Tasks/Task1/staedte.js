@@ -13,21 +13,31 @@ var CHALK_MOD = require('chalk');
  ************************************************************************/
 
 // inner functions will be executed after reading this file
-FS_MOD.readFile(__dirname+'/Tasks/Task1/staedte.json', function(err, data) {
+FS_MOD.readFile(__dirname+'/staedte.json', function(err, data) {
     if (err) throw err;
 
-    // parse the ANY-object into a JSON-object to work with it
-    var cit_JSON = JSON.parse(data);
-    var cit_STR;
+    FS_MOD.readFile(__dirname+'../Task2/mehr_staedte.json', function(err, data2) {
+        var cit2_JSON = JSON.parse(data2);
+        var cit2_STR;
 
-    // sorting function
-    sortCities(cit_JSON);
 
-    //convert JSON-obj to String
-    cit_STR = JSON.stringify(cit_JSON);
+        // parse the ANY-object into a JSON-object to work with it
+        var cit_JSON = JSON.parse(data);
+        var cit_STR;
+
+        // sorting function
+        sortCities(cit_JSON);
+
+        //convert JSON-obj to String
+        cit_STR = JSON.stringify(cit_JSON);
+    }
+
+
+
+
 
     // function will be executed after writing the new JSON file
-    FS_MOD.writeFile(__dirname+'/Tasks/Task1/staedte_sorted.json',
+    FS_MOD.writeFile(__dirname+'/staedte_sorted.json',
         cit_STR,
         function(err) {
 
@@ -58,6 +68,10 @@ function printCities(cit_JSON) {
         console.log(CHALK_MOD.green("population:    " + formatNumberToGerman(cit_JSON.cities[i].population)));
         console.log("-----------------------------");
     }
+}
+
+function combineJSON(a_JSON,b_JSON){
+    
 }
 
 /**
