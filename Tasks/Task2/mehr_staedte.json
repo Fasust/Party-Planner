@@ -1,0 +1,34 @@
+{
+  "cities": [
+    {
+      "name": "New York",
+      "country": "United States of America",
+      "population": 8500000
+    },
+    {
+      "name": "Cologne",
+      "country": "Germany",
+      "population": 1000000
+    },
+    {
+      "name": "Berlin",
+      "country": "Germany",
+      "population": 3700000
+    },
+    {
+      "name": "Madrid",
+      "country": "Spain",
+      "population": 3100000
+    },
+    {
+      "name": "Los Angeles",
+      "country": "United States of America",
+      "population": 3900000
+    },
+    {
+      "name": "Rom",
+      "country": "Italy",
+      "population": 2800000
+    }
+  ]
+}
