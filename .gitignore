@@ -1,7 +1,7 @@
 $ cat .gitignore
 
-# Can ignore specific files
+# ignore Firebase config JSON
 wba2ftsKey.json
 
-# Can also ignore all directories and files in a directory.
+# ignore directory node_modules
 node_modules/
