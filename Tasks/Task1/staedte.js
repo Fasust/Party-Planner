@@ -13,7 +13,7 @@ var CHALK_MOD = require('chalk');
  ************************************************************************/
 
 // inner functions will be executed after reading this file
-FS_MOD.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
+FS_MOD.readFile(__dirname+'/Tasks/Task1/staedte.json', function(err, data) {
     if (err) throw err;
 
     // parse the ANY-object into a JSON-object to work with it
@@ -27,7 +27,7 @@ FS_MOD.readFile(__dirname+'/Tasks/staedte.json', function(err, data) {
     cit_STR = JSON.stringify(cit_JSON);
 
     // function will be executed after writing the new JSON file
-    FS_MOD.writeFile(__dirname+'/Tasks/staedte_sorted.json',
+    FS_MOD.writeFile(__dirname+'/Tasks/Task1/staedte_sorted.json',
         cit_STR,
         function(err) {
 
