@@ -22,7 +22,7 @@ einen Teil besorgen und es soll sichergestellt werden, dass möglichst wenig unt
 
 ### Domänenmodell
 
-![Domänenmodell Partyplaner](Material/dom_modell.jpg)
+![Domänenmodell Partyplaner Grafik](Material/dom_modell.jpg)
 
 ### Anforderungen
 * Anwendungslogik
