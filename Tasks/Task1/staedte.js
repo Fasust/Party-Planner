@@ -12,7 +12,6 @@ var CHALK_MOD = require('chalk');
  * Main
  ************************************************************************/
 
-
 // inner functions will be executed after reading this file
 FS_MOD.readFile(__dirname+'/staedte.json', function(err, data1) {
     if (err) throw err;
@@ -64,10 +63,6 @@ function printCities(cit_JSON) {
         console.log(CHALK_MOD.green("population:    " + formatNumberToGerman(cit_JSON[i].population)));
         console.log("-----------------------------");
     }
-}
-
-function combineJSON(a_JSON,b_JSON){
-    
 }
 
 /**
