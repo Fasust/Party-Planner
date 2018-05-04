@@ -2,6 +2,8 @@ var array = [4, 1];
 
 console.log(sortInteger(array));
 
+console.log(sortIntegerLet(array));
+
 // Variante 2
 function sortInteger(array) {
     if(array[0] > array[1]){  //wenn erste zahl grösser als zweite..
@@ -13,13 +15,11 @@ function sortInteger(array) {
     return array;
 }
 
-/*
 // Variante 2
-function sortInteger(array) {
+function sortIntegerLet(array) {
     let [a,b] = array;
     if(a > b){
         array = [b,a]
     }
     return array;
 }
-*/
