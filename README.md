@@ -8,3 +8,6 @@ Grillparty zu Essen und Trinken gibt. Sie wollen nicht, dass die Besorgung der P
 
 Jeder der Vier soll
 einen Teil besorgen und es soll sichergestellt werden, dass möglichst wenig unterschiedlichen Läden angefahren werden müssen.
+
+
+**Die Dokumentation ist im Wiki zu finden**
