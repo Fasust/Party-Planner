@@ -16,24 +16,10 @@ const ROUTE = "users";
  * Main
  ************************************************************************/
 
-//GET
-router.get('/', function (req, res) {
-    getCollectionAsJSON(ROUTE).then(result => res.json(result));
-});
-router.get('/:uid' ,function (req, res) {
-    var userId = req.params.uid;
-    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
-});
-
-//POST
+//POST-------------------------------------------------------------------
 router.post('/', function (req, res) {
-    //get JSON atributes from req
-    var user_name = req.body.name;
 
-    //build them into a JSON
-    var user = {
-        name : user_name
-    }
+    var user = req.body //JSON in Body
 
     //POST them in Firebase
     var id = getIdInCollection(ROUTE);
@@ -45,7 +31,30 @@ router.post('/', function (req, res) {
     res.json(user);
 });
 
-//DELETE
+//GET-------------------------------------------------------------------
+router.get('/', function (req, res) {
+    getCollectionAsJSON(ROUTE).then(result => res.json(result));
+});
+router.get('/:uid' ,function (req, res) {
+    var userId = req.params.uid;
+    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
+});
+
+//PUT-------------------------------------------------------------------
+router.put('/:uid' ,function (req, res) {
+    var userId = req.params.uid;
+    var newUser = req.body;
+
+    getDokumentAsJSON(ROUTE,userId).then(result =>{
+
+            db.collection(ROUTE).doc(userId).set(newUser);
+            res.send('User: ' +userId+'\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newUser));
+        }
+    );
+
+});
+
+//DELETE----------------------------------------------------------------
 router.delete('/:uid' ,function (req, res) {
     var userId = req.params.uid;
     db.collection(ROUTE).doc(userId).delete();
