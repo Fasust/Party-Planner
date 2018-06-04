@@ -40,7 +40,9 @@ router.post('/', function (req, res) {
     db.collection(ROUTE).doc(id).set(user);
 
     //Send the URI of new User
-    res.send("http://localhost:3000/" + ROUTE + "/" + id);
+    var uri = "http://localhost:3000/" + ROUTE + "/" + id;
+    res.set('location',uri);
+    res.json(user);
 });
 
 //Export as Module
