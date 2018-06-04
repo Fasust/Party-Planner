@@ -45,6 +45,13 @@ router.post('/', function (req, res) {
     res.json(user);
 });
 
+//DELETE
+router.delete('/:uid' ,function (req, res) {
+    var userId = req.params.uid;
+    db.collection(ROUTE).doc(userId).delete();
+    res.send(userId+' was deleted');
+});
+
 //Export as Module
 module.exports = router;
 
