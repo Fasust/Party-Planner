@@ -17,7 +17,7 @@ const db = admin.firestore();
 //Express
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -28,7 +28,6 @@ const PORT = 3000;
 //Routes
 const usersRouter = require('./routes/users');
 const eventsRouter = require('./routes/events');
-const wishlistsRouter = require('./routes/wishlists');
 
 /************************************************************************
  * Main
@@ -72,6 +71,5 @@ function expressExampels() {
 }
 function setRoutes() {
     app.use('/users',usersRouter);
-    app.use('/wishlists',wishlistsRouter);
     app.use('/events',eventsRouter);
 }

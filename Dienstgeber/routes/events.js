@@ -57,6 +57,54 @@ router.delete('/:uid' ,function (req, res) {
     res.send(eventID+' was deleted');
 });
 
+
+
+/************************************************************************
+ * Wishlist
+ ************************************************************************/
+
+//GET-------------------------------------------------------------------
+
+// gebe alle Wunschlisten eines Events aus
+router.get('/:uid/wishlists', function (req, res) {
+    getCollectionAsJSON(ROUTE).then(result => res.json(result));
+});
+
+// gebe die Wunschlisten für ein Event von einem User aus
+
+router.get('/:uid/wishlists/:wid', function (req, res) {
+    var eventID = req.params.eid;
+    var wishlistsID = req.params.wid;
+    getCollectionAsJSON(ROUTE, wishlistsID).then(result => res.json(result));
+});
+
+//PUT-------------------------------------------------------------------
+
+// ändere die Wunschlisten für ein Event von einem User
+
+router.put('/:uid/wishlists/:uid' ,function (req, res) {
+    var eventID = req.params.uid;
+    var wishlistID = req.params.uid;
+    var newWishlist = req.body;
+
+    getDokumentAsJSON(ROUTE, eventID).then(result =>{
+
+            DB.collection(ROUTE).doc(eventID).collection(wishlists).doc(wishlistID).set(newWishlist);
+            res.send('Wishlist: ' + eventID + wishlistID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWishlist));
+        }
+    );
+});
+
+
+
+
+
+
+
+
+
+
+
 //Export as Module
 module.exports = router;
 
