@@ -27,6 +27,7 @@ const PORT = 3000;
 
 //Routes
 const usersRouter = require('./routes/users');
+const eventsRouter = require('./routes/events');
 const wishlistsRouter = require('./routes/wishlists');
 
 /************************************************************************
@@ -72,4 +73,5 @@ function expressExampels() {
 function setRoutes() {
     app.use('/users',usersRouter);
     app.use('/wishlists',wishlistsRouter);
+    app.use('/events',eventsRouter);
 }
