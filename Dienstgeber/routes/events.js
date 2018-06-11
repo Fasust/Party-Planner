@@ -84,23 +84,58 @@ router.get('/:eid/wishlists', function (req, res) {
 
 router.get('/:eid/wishlists/:uid', function (req, res) {
     var eventID = req.params.eid;
-    var wishlistsID = req.params.uid;
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', wishlistsID).then(result => res.json(result));
+    var userID = req.params.uid;
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', userID).then(result => res.json(result));
 });
 
 //PUT-------------------------------------------------------------------
 
 // ändere die Wunschlisten für ein Event von einem User
-
-router.put('/:eid/wishlists/:wid' ,function (req, res) {
+router.put('/:eid/wishlists/:uid' ,function (req, res) {
     var eventID = req.params.eid;
-    var wishlistID = req.params.wid;
+    var userID = req.params.uid;
     var newWishlist = req.body;
 
-    getDokumentAsJSON(ROUTE, eventID).then(result =>{
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', userID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).collection(wishlists).doc(wishlistID).set(newWishlist);
-            res.send('Wishlist: ' + eventID + wishlistID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWishlist));
+            DB.collection(ROUTE).doc(eventID).collection('wishlists').doc(userID).set(newWishlist);
+            res.send('Wishlist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWishlist));
+        }
+    );
+});
+
+
+/************************************************************************
+ * Soppinglist
+ ************************************************************************/
+
+//GET-------------------------------------------------------------------
+
+// gebe alle Shoppinglists eines Events aus
+router.get('/:eid/shoppinglists', function (req, res) {
+    getCollectionAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists').then(result => res.json(result));
+});
+
+// gebe die Shoppingliste für ein Event von einem User aus
+
+router.get('/:eid/shoppinglists/:uid', function (req, res) {
+    var eventID = req.params.eid;
+    var userID = req.params.sid;
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result => res.json(result));
+});
+
+//PUT-------------------------------------------------------------------
+
+// ändere die Shoppingliste für ein Event von einem User
+router.put('/:eid/shoppinglists/:uid' ,function (req, res) {
+    var eventID = req.params.eid;
+    var userID = req.params.uid;
+    var newShoppinglist = req.body;
+
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result =>{
+
+            DB.collection(ROUTE).doc(eventID).collection('shoppinglists').doc(userID).set(newShoppinglist);
+            res.send('Shoppinglist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newShoppinglist));
         }
     );
 });
