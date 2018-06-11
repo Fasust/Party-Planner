@@ -84,9 +84,9 @@ router.put('/:eid/wishlists/:uid' ,function (req, res) {
     var userID = req.params.uid;
     var newWishlist = req.body;
 
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', eventID).then(result =>{
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', userID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).collection(wishlists).doc(userID).set(newWishlist);
+            DB.collection(ROUTE).doc(eventID).collection('wishlists').doc(userID).set(newWishlist);
             res.send('Wishlist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWishlist));
         }
     );
@@ -120,9 +120,9 @@ router.put('/:eid/shoppinglists/:uid' ,function (req, res) {
     var userID = req.params.uid;
     var newShoppinglist = req.body;
 
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', eventID).then(result =>{
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).collection(shoppinglists).doc(userID).set(newShoppinglist);
+            DB.collection(ROUTE).doc(eventID).collection('shoppinglists').doc(userID).set(newShoppinglist);
             res.send('Shoppinglist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newShoppinglist));
         }
     );
