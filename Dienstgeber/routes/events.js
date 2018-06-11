@@ -15,7 +15,7 @@ const ROUTE = "events";
 //POST-------------------------------------------------------------------
 router.post('/', function (req, res) {
 
-    var event = req.body //JSON in Body
+    var event = req.body; //JSON in Body
 
     //POST them in Firebase
     var id = getIdInCollection(ROUTE);
@@ -32,14 +32,14 @@ router.get('/', function (req, res) {
     getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
 
-router.get('/:uid' ,function (req, res) {
-    var eventID = req.params.uid;
+router.get('/:eid' ,function (req, res) {
+    var eventID = req.params.eid;
     getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
 //PUT-------------------------------------------------------------------
-router.put('/:uid' ,function (req, res) {
-    var eventID = req.params.uid;
+router.put('/:eid' ,function (req, res) {
+    var eventID = req.params.eid;
     var newEvent = req.body;
 
     getDokumentAsJSON(ROUTE, eventID).then(result =>{
@@ -51,13 +51,11 @@ router.put('/:uid' ,function (req, res) {
 });
 
 //DELETE----------------------------------------------------------------
-router.delete('/:uid' ,function (req, res) {
-    var eventID = req.params.uid;
+router.delete('/:eid' ,function (req, res) {
+    var eventID = req.params.eid;
     DB.collection(ROUTE).doc(eventID).delete();
     res.send(eventID+' was deleted');
 });
-
-
 
 /************************************************************************
  * Wishlist
@@ -66,25 +64,25 @@ router.delete('/:uid' ,function (req, res) {
 //GET-------------------------------------------------------------------
 
 // gebe alle Wunschlisten eines Events aus
-router.get('/:uid/wishlists', function (req, res) {
-    getCollectionAsJSON(ROUTE).then(result => res.json(result));
+router.get('/:eid/wishlists', function (req, res) {
+    getCollectionAsJSON(ROUTE + '/' + req.params.eid + '/wishlists').then(result => res.json(result));
 });
 
 // gebe die Wunschlisten für ein Event von einem User aus
 
-router.get('/:uid/wishlists/:wid', function (req, res) {
+router.get('/:eid/wishlists/:uid', function (req, res) {
     var eventID = req.params.eid;
-    var wishlistsID = req.params.wid;
-    getCollectionAsJSON(ROUTE, wishlistsID).then(result => res.json(result));
+    var wishlistsID = req.params.uid;
+    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', wishlistsID).then(result => res.json(result));
 });
 
 //PUT-------------------------------------------------------------------
 
 // ändere die Wunschlisten für ein Event von einem User
 
-router.put('/:uid/wishlists/:uid' ,function (req, res) {
-    var eventID = req.params.uid;
-    var wishlistID = req.params.uid;
+router.put('/:eid/wishlists/:wid' ,function (req, res) {
+    var eventID = req.params.eid;
+    var wishlistID = req.params.wid;
     var newWishlist = req.body;
 
     getDokumentAsJSON(ROUTE, eventID).then(result =>{
