@@ -27,6 +27,7 @@ router.post('/', function (req, res) {
 
     //Send the URI of new User
     var uri = "http://localhost:3000/" + ROUTE + "/" + id;
+
     res.set('location',uri);
     res.json(user);
 });

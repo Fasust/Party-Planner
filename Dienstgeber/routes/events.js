@@ -16,13 +16,25 @@ const ROUTE = "events";
 router.post('/', function (req, res) {
 
     var event = req.body; //JSON in Body
+    var eventName = event.name;
+    var eventUsers = event.users;
+
+    var eventID = getIdInCollection(ROUTE);
+    event.eventList = {};
 
     //POST them in Firebase
-    var id = getIdInCollection(ROUTE);
-    DB.collection(ROUTE).doc(id).set(event);
+    DB.collection(ROUTE).doc(eventID).set(event);
+
+
+    eventUsers.forEach( userId => {
+        var list = {};
+        DB.collection(ROUTE).doc(eventID).collection("wishlists").doc(userId).set(list);
+        DB.collection(ROUTE).doc(eventID).collection("shoppinglists").doc(userId).set(list);
+    });
+
 
     //Send the URI of new event
-    var uri = "http://localhost:3000/" + ROUTE + "/" + id;
+    var uri = "http://localhost:3000/" + ROUTE + "/" + eventID;
     res.set('location',uri);
     res.json(event);
 });
@@ -92,15 +104,6 @@ router.put('/:eid/wishlists/:wid' ,function (req, res) {
         }
     );
 });
-
-
-
-
-
-
-
-
-
 
 
 //Export as Module
