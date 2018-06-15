@@ -26,7 +26,6 @@ router.post('/', function (req, res) {
     var eventUsers = event.users;
 
     var eventID = getIdInCollection(ROUTE);
-    event.eventList = {};
 
     //POST them in Firebase
     DB.collection(ROUTE).doc(eventID).set(event);
@@ -122,10 +121,23 @@ router.get('/:eid/shoppinglists', function (req, res) {
 router.get('/:eid/shoppinglists/:sid', function (req, res) {
     var eventID = req.params.eid;
     var userID = req.params.sid;
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/' + ROUTE_SHOP, userID).then(result => res.json(result));
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, userID).then(result => res.json(result));
 });
 
 //POST-------------------------------------------------------------------
+router.post('/:eid/shoppinglists', function (req, res) {
+    var eventID = req.params.eid;
+    //GET all WISHES in EVENT
+
+    //GET all USERS in EVENT
+
+    //Match Wishes by Location
+
+    //POST Wischlist for each USER
+
+
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, userID).then(result => res.json(result));
+});
 
 //Export as Module
 module.exports = router;
