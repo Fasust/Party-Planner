@@ -11,6 +11,12 @@ var express = require("express");
 var router = express.Router(null);
 
 const ROUTE = "events";
+const ROUTE_WISH = "wishlists";
+const ROUTE_SHOP = "shoppinglists";
+
+/************************************************************************
+ * Events
+ ************************************************************************/
 
 //POST-------------------------------------------------------------------
 router.post('/', function (req, res) {
@@ -25,13 +31,12 @@ router.post('/', function (req, res) {
     //POST them in Firebase
     DB.collection(ROUTE).doc(eventID).set(event);
 
-
+    //GET All users of The Event and Crate shopping and wish lists for them
     eventUsers.forEach( userId => {
         var list = {};
-        DB.collection(ROUTE).doc(eventID).collection("wishlists").doc(userId).set(list);
-        DB.collection(ROUTE).doc(eventID).collection("shoppinglists").doc(userId).set(list);
+        DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(userId).set(list);
+        DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(userId).set(list);
     });
-
 
     //Send the URI of new event
     var uri = "http://localhost:3000/" + ROUTE + "/" + eventID;
@@ -46,6 +51,7 @@ router.get('/', function (req, res) {
 
 router.get('/:eid' ,function (req, res) {
     var eventID = req.params.eid;
+
     getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
@@ -77,7 +83,8 @@ router.delete('/:eid' ,function (req, res) {
 
 // gebe alle Wunschlisten eines Events aus
 router.get('/:eid/wishlists', function (req, res) {
-    getCollectionAsJSON(ROUTE + '/' + req.params.eid + '/wishlists').then(result => res.json(result));
+    getCollectionAsJSON(ROUTE + '/' + req.params.eid + '/' + ROUTE_WISH).then(result => res.json(result));
+
 });
 
 // gebe die Wunschlisten für ein Event von einem User aus
@@ -85,25 +92,19 @@ router.get('/:eid/wishlists', function (req, res) {
 router.get('/:eid/wishlists/:uid', function (req, res) {
     var eventID = req.params.eid;
     var userID = req.params.uid;
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', userID).then(result => res.json(result));
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, userID).then(result => res.json(result));
 });
+/************************
+ * Wishlist Items
+ ***********************/
 
-//PUT-------------------------------------------------------------------
+//GET-------------------------------------------------------------------
 
-// ändere die Wunschlisten für ein Event von einem User
-router.put('/:eid/wishlists/:uid' ,function (req, res) {
-    var eventID = req.params.eid;
-    var userID = req.params.uid;
-    var newWishlist = req.body;
+//PUT
 
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/wishlists', userID).then(result =>{
+//POST------------------------------------------------------------------
 
-            DB.collection(ROUTE).doc(eventID).collection('wishlists').doc(userID).set(newWishlist);
-            res.send('Wishlist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWishlist));
-        }
-    );
-});
-
+//DELETE----------------------------------------------------------------
 
 /************************************************************************
  * Soppinglist
@@ -124,22 +125,7 @@ router.get('/:eid/shoppinglists/:uid', function (req, res) {
     getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result => res.json(result));
 });
 
-//PUT-------------------------------------------------------------------
-
-// ändere die Shoppingliste für ein Event von einem User
-router.put('/:eid/shoppinglists/:uid' ,function (req, res) {
-    var eventID = req.params.eid;
-    var userID = req.params.uid;
-    var newShoppinglist = req.body;
-
-    getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result =>{
-
-            DB.collection(ROUTE).doc(eventID).collection('shoppinglists').doc(userID).set(newShoppinglist);
-            res.send('Shoppinglist: ' + eventID + 'User: '+ userID + '\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newShoppinglist));
-        }
-    );
-});
-
+//POST-------------------------------------------------------------------
 
 //Export as Module
 module.exports = router;
@@ -164,14 +150,12 @@ function getCollectionAsJSON(collectionName) {
         });
     });
 }
-
 function getIdInCollection(collectionName) {
     var ref = DB.collection(collectionName).doc();
     var id = ref.id;
 
     return id;
 }
-
 function getDokumentAsJSON(collectionName,docName) {
     return new Promise(function (resolve) {
         var json = {};
