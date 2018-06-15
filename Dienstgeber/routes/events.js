@@ -119,7 +119,7 @@ router.get('/:eid/shoppinglists', function (req, res) {
 
 // gebe die Shoppingliste für ein Event von einem User aus
 
-router.get('/:eid/shoppinglists/:uid', function (req, res) {
+router.get('/:eid/shoppinglists/:sid', function (req, res) {
     var eventID = req.params.eid;
     var userID = req.params.sid;
     getDokumentAsJSON(ROUTE + '/' + req.params.eid + '/shoppinglists', userID).then(result => res.json(result));
