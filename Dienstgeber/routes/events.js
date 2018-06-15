@@ -30,11 +30,10 @@ router.post('/', function (req, res) {
     //POST them in Firebase
     DB.collection(ROUTE).doc(eventID).set(event);
 
-    //GET All users of The Event and Crate shopping and wish lists for them
+    //GET All users of The Event and Crate wishlists for them
     eventUsers.forEach( userId => {
         var list = {};
         DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(userId).set(list);
-        DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(userId).set(list);
     });
 
     //Send the URI of new event
@@ -133,7 +132,8 @@ router.post('/:eid/shoppinglists', function (req, res) {
 
     //Match Wishes by Location
 
-    //POST Wischlist for each USER
+    //POST Shoppinglists for each USER
+    DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(userId).set(list);
 
 
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, userID).then(result => res.json(result));
