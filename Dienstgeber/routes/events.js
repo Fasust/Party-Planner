@@ -208,16 +208,46 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
 router.post('/:eid/shoppinglist', function (req, res) {
     var eventID = req.params.eid;
     //GET all WISHES in EVENT
+    wishCollection = DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
+    userCollection = DB.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
 
-    //Match Wishes by Location
+    userCollection.get()
+        .then(users => {
 
-    //POST Shoppinglists for each USER
-    DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(userId).set(list);
+            //GET all user Ids in Event
+            userIDs = {};
+            var userIndex = 0;
+            users.forEach(user => {
+                userIDs[userIndex] = user.id;
+                userIndex++;
+            });
 
+            wishCollection.get()
+                .then(wishes => {
+                    var previosLocation = "";
+                    var currentLocation = "";
 
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, userID).then(result => res.json(result));
+                    var index = 0;
+
+                    //Match Wishes by Location
+                    wishes.forEach(wish => {
+                        currentLocation = wish.data().location;
+                        if(currentLocation != previosLocation){ // if more locations than users, loop back around
+                            if(index == userIDs.size) {
+                                index = 0
+                            }else{
+                                index++;
+                            }
+                        }
+                        DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wish.id,"user" : userIDs[index]});
+                        previosLocation = currentLocation;
+                    });
+                    //Send Result
+                    getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
+                });
+            });
 });
 
 //Export as Module
