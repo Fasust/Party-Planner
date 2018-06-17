@@ -241,6 +241,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                                 index++;
                             }
                         }
+                        //add result to firestore
                         DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wish.id,"user" : userIDs[index]});
                         previosLocation = currentLocation;
                     });
