@@ -30,6 +30,20 @@ const usersRouter = require('./routes/users');
 const eventsRouter = require('./routes/events');
 
 /************************************************************************
+ * Faye server
+ ************************************************************************/
+/*var http = require('http'); //TODO: Faye server konfigurieren(?)
+var faye = require('faye');
+
+var server = http.createServer(),
+    bayeux = new faye.NodeAdapter({mount: 'faye', timeout:45});
+
+
+bayeux.attach(server);
+server.listen(8000);
+console.log("Faye server listening on port 8000");
+*/
+/************************************************************************
  * Main
  ************************************************************************/
 
