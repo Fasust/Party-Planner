@@ -85,7 +85,6 @@ router.get('/:eid/wishes/:wid', function (req, res) {
 
 //POST------------------------------------------------------------------
 
-//one new Wish
 router.post('/:eid/wishes', function (req, res) {
 
     var wish = req.body; //JSON in Body
@@ -94,9 +93,6 @@ router.post('/:eid/wishes', function (req, res) {
     var route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
 
     var wishID = getIdInCollection(route);
-
-    //Link User to userFiled in Wish
-    wish.user = DB.collection("users").doc(userID);
 
     //POST it in Firebase
     DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
@@ -114,10 +110,7 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     var newWish = req.body;
     var userID = newWish.user;
     var route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
-
-    //Link User to userFiled in Wish
-    newWish.user = DB.collection("users").doc(userID);
-
+    
     getDokumentAsJSON(route, wishID).then(result =>{
 
             DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish)
