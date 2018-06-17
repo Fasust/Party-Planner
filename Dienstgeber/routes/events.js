@@ -89,10 +89,14 @@ router.get('/:eid/wishes/:wid', function (req, res) {
 router.post('/:eid/wishes', function (req, res) {
 
     var wish = req.body; //JSON in Body
+    var userID = wish.user;
     var eventID = req.params.eid;
     var route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
 
     var wishID = getIdInCollection(route);
+
+    //Link User to userFiled in Wish
+    wish.user = DB.collection("events").doc(eventID);
 
     //POST it in Firebase
     DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
@@ -100,7 +104,7 @@ router.post('/:eid/wishes', function (req, res) {
     //Send the URI of new event
     var uri = "http://localhost:3000/" + route + "/" + wishID;
     res.set('location',uri);
-    res.json(event);
+    res.json(wish);
 });
 
 //PUT------------------------------------------------------------------
@@ -204,7 +208,6 @@ function getDokumentAsJSON(collectionName,docName) {
         });
     });
 }
-
 /*
 
 
