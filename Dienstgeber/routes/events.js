@@ -11,8 +11,7 @@ var express = require("express");
 var router = express.Router(null);
 
 const ROUTE = "events";
-const ROUTE_WISH = "wishlists";
-const ROUTE_SHOP = "shoppinglists";
+const ROUTE_WISH = "wishes";
 
 /************************************************************************
  * Events
@@ -22,19 +21,11 @@ const ROUTE_SHOP = "shoppinglists";
 router.post('/', function (req, res) {
 
     var event = req.body; //JSON in Body
-    var eventName = event.name;
-    var eventUsers = event.users;
 
     var eventID = getIdInCollection(ROUTE);
 
-    //POST them in Firebase
+    //POST it in Firebase
     DB.collection(ROUTE).doc(eventID).set(event);
-
-    //GET All users of The Event and Crate wishlists for them
-    eventUsers.forEach( userId => {
-        var list = {};
-        DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(userId).set(list);
-    });
 
     //Send the URI of new event
     var uri = "http://localhost:3000/" + ROUTE + "/" + eventID;
@@ -74,35 +65,66 @@ router.delete('/:eid' ,function (req, res) {
 });
 
 /************************************************************************
- * Wishlist
+ * Wishes
  ************************************************************************/
 
 //GET-------------------------------------------------------------------
 
-// gebe alle Wunschlisten eines Events aus
-router.get('/:eid/wishlists', function (req, res) {
+// gebe alle Wuensche eines Events aus
+router.get('/:eid/wishes', function (req, res) {
     getCollectionAsJSON(ROUTE + '/' + req.params.eid + '/' + ROUTE_WISH).then(result => res.json(result));
 
 });
 
-// gebe die Wunschlisten für ein Event von einem User aus
-
-router.get('/:eid/wishlists/:uid', function (req, res) {
+// gebe einen Wunschn für ein Event áus
+router.get('/:eid/wishes/:wid', function (req, res) {
     var eventID = req.params.eid;
-    var userID = req.params.uid;
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, userID).then(result => res.json(result));
+    var wishID = req.params.wid;
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
-/************************
- * Wishlist Items
- ***********************/
-
-//GET-------------------------------------------------------------------
-
-//PUT
 
 //POST------------------------------------------------------------------
 
+//one new Wish
+router.post('/:eid/wishes', function (req, res) {
+
+    var wish = req.body; //JSON in Body
+    var eventID = req.params.eid;
+    var route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
+
+    var wishID = getIdInCollection(route);
+
+    //POST it in Firebase
+    DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+
+    //Send the URI of new event
+    var uri = "http://localhost:3000/" + route + "/" + wishID;
+    res.set('location',uri);
+    res.json(event);
+});
+
+//PUT------------------------------------------------------------------
+router.put('/:eid/wishes/:wid' ,function (req, res) {
+    var eventID = req.params.eid;
+    var wishID = req.params.wid;
+    var newWish = req.body;
+    var route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
+
+    getDokumentAsJSON(route, wishID).then(result =>{
+
+            DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish)
+            res.send('Wish: ' +wishID+'\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newWish));
+        }
+    );
+});
+
 //DELETE----------------------------------------------------------------
+router.delete('/:eid/wishes/:wid' ,function (req, res) {
+    var eventID = req.params.eid;
+    var wishID = req.params.wid;
+    DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).delete();
+    res.send(wishID+' was deleted');
+});
 
 /************************************************************************
  * Soppinglist
@@ -182,3 +204,13 @@ function getDokumentAsJSON(collectionName,docName) {
         });
     });
 }
+
+/*
+
+
+    //GET All users of The Event and Crate wishlists for them
+    eventUsers.forEach( userId => {
+        var list = {};
+        DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(userId).set(list);
+    });
+ */
