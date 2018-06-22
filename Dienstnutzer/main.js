@@ -5,6 +5,7 @@
  ************************************************************************/
 
 const request = require('request');
+const rp = require('request-promise');
 
 //Express
 const express = require('express');
@@ -16,13 +17,33 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 const PORT = 4000;
+const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main
  ************************************************************************/
 
 initExpress();
-expressExampels();
+
+app.get('/', function (req, res) {
+    console.log("Recieved GET");
+
+    var options = {
+        method: 'GET',
+        uri: DIENST_GEBER + '/users',
+        json: true // Automatically stringifies the body to JSON
+    };
+    console.log("Set Options");
+
+    rp(options)
+        .then(function (parsedBody) {
+            console.log("Responding..."+parsedBody);
+            res.json(parsedBody);
+        })
+        .catch(function (err) {
+            // POST failed...
+        });
+});
 
 /************************************************************************
  * Functions
@@ -44,15 +65,4 @@ function initExpress() {
         console.log("Time: \t" + Date.now() + "\t| Request-path:\t" + req.path);
         next();
     });
-}
-function expressExampels() {
-
-    app.get('/', function (req, res) {
-        res.send('Hello World!');
-    });
-
-    app.post('/', function (req, res) {
-        res.send('Got a POST request');
-    });
-
 }
