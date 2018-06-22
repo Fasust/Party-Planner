@@ -35,14 +35,17 @@ app.post('/events', function (req, res) {
     postUser(usersNames).then(function (users) {
         postEvent(eventName).then(function (eventlocation) {
             postUserToEvent(users,eventlocation);
+
             let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
                 +"Sie finden es hier: " + eventlocation
             + "\n\nDie User : " + JSON.stringify(users) + "\nwurder erstellt und dem Event zugefügt.";
-            res.send(responseMessage);
+
+            res.send(responseMessage); //send Response
         });
     });
 
 });
+
 
 
 /************************************************************************
