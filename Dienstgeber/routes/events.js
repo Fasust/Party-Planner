@@ -7,6 +7,7 @@ const ADMIN = require("firebase-admin");
 const DB = ADMIN.firestore();
 
 //init express module
+// cn: besser nur const oder let verwenden
 var express = require("express");
 var router = express.Router(null);
 
