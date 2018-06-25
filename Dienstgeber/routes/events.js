@@ -3,8 +3,8 @@
  ************************************************************************/
 
 //init firestore module
-const ADMIN = require("firebase-admin");
-const DB = ADMIN.firestore();
+const admin = require("firebase-admin");
+const db = admin.firestore();
 
 //init express module
 const express = require("express");
@@ -27,7 +27,7 @@ router.post('/', function (req, res) {
     let eventID = getIdInCollection(ROUTE);
 
     //POST it in Firebase
-    DB.collection(ROUTE).doc(eventID).set(event);
+    db.collection(ROUTE).doc(eventID).set(event);
 
     //Send the URI of new event
     let uri = "http://localhost:3000/" + ROUTE + "/" + eventID;
@@ -53,7 +53,7 @@ router.put('/:eid' ,function (req, res) {
 
     getDokumentAsJSON(ROUTE, eventID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).set(newEvent);
+            db.collection(ROUTE).doc(eventID).set(newEvent);
             res.send('Event: ' +eventID+'\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newEvent));
         }
     );
@@ -62,7 +62,7 @@ router.put('/:eid' ,function (req, res) {
 //DELETE----------------------------------------------------------------
 router.delete('/:eid' ,function (req, res) {
     let eventID = req.params.eid;
-    DB.collection(ROUTE).doc(eventID).delete();
+    db.collection(ROUTE).doc(eventID).delete();
     res.send(eventID+' was deleted');
 });
 
@@ -97,7 +97,7 @@ router.post('/:eid/wishes', function (req, res) {
     let wishID = getIdInCollection(route);
 
     //POST it in Firebase
-    DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
 
     //Send the URI of new event
     let uri = "http://localhost:3000/" + route + "/" + wishID;
@@ -115,7 +115,7 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
 
     getDokumentAsJSON(route, wishID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
             res.send('Wish: ' +wishID+'\nwas set from: \n' + JSON.stringify(result) +'\nto: \n' + JSON.stringify(newWish));
         }
     );
@@ -125,7 +125,7 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
 router.delete('/:eid/wishes/:wid' ,function (req, res) {
     let eventID = req.params.eid;
     let wishID = req.params.wid;
-    DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).delete();
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).delete();
     res.send(wishID+' was deleted');
 });
 
@@ -156,7 +156,7 @@ router.post('/:eid/users', function (req, res) {
     let route = ROUTE + "/" + eventID + "/" + ROUTE_USER;
 
     //POST it in Firebase
-    DB.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(user);
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(user);
 
     //Send the URI of new event
     let uri = "http://localhost:3000/" + route + "/" + userID;
@@ -174,7 +174,7 @@ router.put('/:eid/users/:uid' ,function (req, res) {
 
     getDokumentAsJSON(route, userID).then(result =>{
 
-            DB.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
             res.send('User: ' +userID+'\n in Event '+ eventID + ' was set from: \n' + JSON.stringify(result) +'\nto: \n' + JSON.stringify(newUser));
         }
     );
@@ -184,7 +184,7 @@ router.put('/:eid/users/:uid' ,function (req, res) {
 router.delete('/:eid/users/:uid' ,function (req, res) {
     let eventID = req.params.eid;
     let userID = req.params.uid;
-    DB.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).delete();
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).delete();
     res.send(userID+' was removed from Event: ' + eventID);
 });
 
@@ -208,10 +208,10 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
 router.post('/:eid/shoppinglist', function (req, res) {
     let eventID = req.params.eid;
     //GET all WISHES in EVENT
-    wishCollection = DB.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
+    wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
-    userCollection = DB.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
+    userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
 
     userCollection.get()
         .then(users => {
@@ -242,7 +242,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                             }
                         }
                         //add result to firestore
-                        DB.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wish.id,"user" : userIDs[index]});
+                        db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wish.id,"user" : userIDs[index]});
                         previosLocation = currentLocation;
                     });
                     //Send Result
