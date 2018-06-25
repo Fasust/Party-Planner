@@ -10,7 +10,7 @@ const rp = require('request-promise');
 //Express
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -32,9 +32,9 @@ app.post('/events', function (req, res) {
     let eventName = req.body.name; //Get Event Name
 
 
-    postUser(usersNames).then(function (users) {
+    postUsers(usersNames).then(function (users) {
         postEvent(eventName).then(function (eventlocation) {
-            postUserToEvent(users,eventlocation);
+            postUsersToEvent(users,eventlocation);
 
             let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
                 +"Sie finden es hier: " + eventlocation
@@ -51,6 +51,9 @@ app.post('/events', function (req, res) {
 /************************************************************************
  * Functions
  ************************************************************************/
+/**
+ * Initalize Express: Listen on Port, Init Log, init Erro Handling
+ */
 function initExpress() {
 
     app.listen(PORT, function () {
@@ -69,16 +72,26 @@ function initExpress() {
         next();
     });
 }
+/**
+ * Cuts a URI (URL) at its last "/" and returns the second half of the string
+ * @param uri a URI as a String
+ * @returns {*|string} hopefully an ID
+ */
 function uriToID(uri) {
     let uriArray = uri.split('/');
     return uriArray[uriArray.length -1];
 }
 
-function postUser(userNames) {
+/**
+ * Takes an Array of Names and Posts each on as a new User
+ * @param userNames Array of names
+ * @returns {Promise<any>} a Promis that is to be resoled with a JSON that links each name to there Location (URI) in the System
+ */
+function postUsers(userNames) {
     let users = {};
 
     //Build base Options
-    var options = {
+    let options = {
         method: 'POST',
         uri : DIENST_GEBER + '/users',
         json: true, // Automatically stringifies the body to JSON
@@ -104,11 +117,16 @@ function postUser(userNames) {
         });
     });
 }
+/**
+ * POST new Event with Given Name
+ * @param eventName name of event to be Posted
+ * @returns {Promise<any>} A promise that is to be resolved with a String that contains the Location (URI) of the new Event
+ */
 function postEvent(eventName) {
     let eventLocation;
 
     //Build base Options
-    var options = {
+    let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events',
         body : {'name' : eventName},
@@ -125,9 +143,15 @@ function postEvent(eventName) {
         });
     });
 }
-function postUserToEvent(userIDs, eventlocation) {
+/**
+ * Adds multiple users to given Event
+ * @param userIDs JSON of User names that map to their IDs (Return of "postUsers")
+ * @param eventlocation URI of Event
+ * @returns {Promise<any>}
+ */
+function postUsersToEvent(userIDs, eventlocation) {
 
-    var options = {
+    let options = {
         method: 'POST',
         uri :  eventlocation + '/users',
         json: true, // Automatically stringifies the body to JSON
@@ -137,10 +161,10 @@ function postUserToEvent(userIDs, eventlocation) {
 
     return new Promise((resolve, reject) => {  //Build Promise
 
-        for (var key in userIDs){ //Iterate through all User names in req
+        for (let key in userIDs){ //Iterate through all User names in req
 
-            var userName = key;
-            var userID = userIDs[key];
+            let userName = key;
+            let userID = userIDs[key];
             console.log(key +" | " + userID);
 
             options.body = {'user': uriToID(userID)}; //Get Id of each User
