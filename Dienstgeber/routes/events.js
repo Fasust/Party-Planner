@@ -7,7 +7,6 @@ const ADMIN = require("firebase-admin");
 const DB = ADMIN.firestore();
 
 //init express module
-// cn: besser nur const oder let verwenden
 const express = require("express");
 const router = express.Router(null);
 
@@ -259,11 +258,27 @@ module.exports = router;
  * Functions
  ************************************************************************/
 
+/**
+ * Returns a unigue ID in a specific collection
+ * @param collectionName name of the collection that a id is to be generated for
+ * @returns int id unique ID
+ */
+function getIdInCollection(collectionName) {
+    let ref = db.collection(collectionName).doc();
+    let id = ref.id;
+
+    return id;
+}
+/**
+ * Returns a Promise that is to be resolved as a JSON and represents a specific collection (GET)
+ * @param collectionName naem of the collecetion
+ * @returns {Promise<any>} Promise that resolves as JSON
+ */
 function getCollectionAsJSON(collectionName) {
     return new Promise(function (resolve) {
         let json = {};
 
-        let collection = DB.collection(collectionName);
+        let collection = db.collection(collectionName);
         collection.get()
             .then(snapshot => {
                 snapshot.forEach(doc => {
@@ -275,17 +290,17 @@ function getCollectionAsJSON(collectionName) {
         });
     });
 }
-function getIdInCollection(collectionName) {
-    let ref = DB.collection(collectionName).doc();
-    let id = ref.id;
-
-    return id;
-}
+/**
+ * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
+ * @param collectionName name of the collection
+ * @param docName name of the documeten
+ * @returns {Promise<any>} Promise that resolves as JSON
+ */
 function getDokumentAsJSON(collectionName,docName) {
     return new Promise(function (resolve) {
         let json = {};
 
-        let document = DB.collection(collectionName).doc(docName);
+        let document = db.collection(collectionName).doc(docName);
         document.get()
             .then(doc => {
                 json = doc.data();

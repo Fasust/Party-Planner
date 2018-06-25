@@ -48,12 +48,14 @@ console.log("Faye server listening on port 8000");
  ************************************************************************/
 
 initExpress();
-expressExampels();
 setRoutes();
 
 /************************************************************************
  * Functions
  ************************************************************************/
+/**
+ * Initalize Express: Listen on Port, Init Log, init Erro Handling
+ */
 function initExpress() {
 
     app.listen(PORT, function () {
@@ -72,17 +74,9 @@ function initExpress() {
         next();
     });
 }
-function expressExampels() {
-
-    app.get('/', function (req, res) {
-        res.send('Hello World!');
-    });
-
-    app.post('/', function (req, res) {
-        res.send('Got a POST request');
-    });
-
-}
+/**
+ * Set Express Routes Users, Events
+ */
 function setRoutes() {
     app.use('/users',usersRouter);
     app.use('/events',eventsRouter);

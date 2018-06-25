@@ -32,9 +32,9 @@ app.post('/events', function (req, res) {
     let eventName = req.body.name; //Get Event Name
 
 
-    postUser(usersNames).then(function (users) {
+    postUsers(usersNames).then(function (users) {
         postEvent(eventName).then(function (eventlocation) {
-            postUserToEvent(users,eventlocation);
+            postUsersToEvent(users,eventlocation);
 
             let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
                 +"Sie finden es hier: " + eventlocation
@@ -51,6 +51,9 @@ app.post('/events', function (req, res) {
 /************************************************************************
  * Functions
  ************************************************************************/
+/**
+ * Initalize Express: Listen on Port, Init Log, init Erro Handling
+ */
 function initExpress() {
 
     app.listen(PORT, function () {
@@ -69,12 +72,22 @@ function initExpress() {
         next();
     });
 }
+/**
+ * Cuts a URI (URL) at its last "/" and returns the second half of the string
+ * @param uri a URI as a String
+ * @returns {*|string} hopefully an ID
+ */
 function uriToID(uri) {
     let uriArray = uri.split('/');
     return uriArray[uriArray.length -1];
 }
 
-function postUser(userNames) {
+/**
+ * Takes an Array of Names and Posts each on as a new User
+ * @param userNames Array of names
+ * @returns {Promise<any>} a Promis that is to be resoled with a JSON that links each name to there Location (URI) in the System
+ */
+function postUsers(userNames) {
     let users = {};
 
     //Build base Options
@@ -104,6 +117,11 @@ function postUser(userNames) {
         });
     });
 }
+/**
+ * POST new Event with Given Name
+ * @param eventName name of event to be Posted
+ * @returns {Promise<any>} A promise that is to be resolved with a String that contains the Location (URI) of the new Event
+ */
 function postEvent(eventName) {
     let eventLocation;
 
@@ -125,7 +143,13 @@ function postEvent(eventName) {
         });
     });
 }
-function postUserToEvent(userIDs, eventlocation) {
+/**
+ * Adds multiple users to given Event
+ * @param userIDs JSON of User names that map to their IDs (Return of "postUsers")
+ * @param eventlocation URI of Event
+ * @returns {Promise<any>}
+ */
+function postUsersToEvent(userIDs, eventlocation) {
 
     let options = {
         method: 'POST',

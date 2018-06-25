@@ -69,12 +69,22 @@ module.exports = router;
  * Functions
  ************************************************************************/
 
+/**
+ * Returns a unigue ID in a specific collection
+ * @param collectionName name of the collection that a id is to be generated for
+ * @returns int id unique ID
+ */
 function getIdInCollection(collectionName) {
     let ref = db.collection(collectionName).doc();
     let id = ref.id;
 
     return id;
 }
+/**
+ * Returns a Promise that is to be resolved as a JSON and represents a specific collection (GET)
+ * @param collectionName naem of the collecetion
+ * @returns {Promise<any>} Promise that resolves as JSON
+ */
 function getCollectionAsJSON(collectionName) {
     return new Promise(function (resolve) {
         let json = {};
@@ -91,6 +101,12 @@ function getCollectionAsJSON(collectionName) {
             });
     });
 }
+/**
+ * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
+ * @param collectionName name of the collection
+ * @param docName name of the documeten
+ * @returns {Promise<any>} Promise that resolves as JSON
+ */
 function getDokumentAsJSON(collectionName,docName) {
     return new Promise(function (resolve) {
         let json = {};
