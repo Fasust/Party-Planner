@@ -10,7 +10,7 @@ const rp = require('request-promise');
 //Express
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -78,7 +78,7 @@ function postUser(userNames) {
     let users = {};
 
     //Build base Options
-    var options = {
+    let options = {
         method: 'POST',
         uri : DIENST_GEBER + '/users',
         json: true, // Automatically stringifies the body to JSON
@@ -108,7 +108,7 @@ function postEvent(eventName) {
     let eventLocation;
 
     //Build base Options
-    var options = {
+    let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events',
         body : {'name' : eventName},
@@ -127,7 +127,7 @@ function postEvent(eventName) {
 }
 function postUserToEvent(userIDs, eventlocation) {
 
-    var options = {
+    let options = {
         method: 'POST',
         uri :  eventlocation + '/users',
         json: true, // Automatically stringifies the body to JSON
@@ -137,10 +137,10 @@ function postUserToEvent(userIDs, eventlocation) {
 
     return new Promise((resolve, reject) => {  //Build Promise
 
-        for (var key in userIDs){ //Iterate through all User names in req
+        for (let key in userIDs){ //Iterate through all User names in req
 
-            var userName = key;
-            var userID = userIDs[key];
+            let userName = key;
+            let userID = userIDs[key];
             console.log(key +" | " + userID);
 
             options.body = {'user': uriToID(userID)}; //Get Id of each User

@@ -17,7 +17,7 @@ const db = admin.firestore();
 //Express
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -32,10 +32,10 @@ const eventsRouter = require('./routes/events');
 /************************************************************************
  * Faye server
  ************************************************************************/
-/*var http = require('http'); //TODO: Faye server konfigurieren(?)
-var faye = require('faye');
+/*let http = require('http'); //TODO: Faye server konfigurieren(?)
+let faye = require('faye');
 
-var server = http.createServer(),
+let server = http.createServer(),
     bayeux = new faye.NodeAdapter({mount: 'faye', timeout:45});
 
 

@@ -7,8 +7,8 @@ const admin = require("firebase-admin");
 const db = admin.firestore();
 
 //Express
-var express = require('express');
-var router = express.Router(null);
+const express = require('express');
+const router = express.Router(null);
 
 const ROUTE = "users";
 
@@ -19,14 +19,14 @@ const ROUTE = "users";
 //POST-------------------------------------------------------------------
 router.post('/', function (req, res) {
 
-    var user = req.body //JSON in Body
+    let user = req.body //JSON in Body
 
     //POST them in Firebase
-    var id = getIdInCollection(ROUTE);
+    let id = getIdInCollection(ROUTE);
     db.collection(ROUTE).doc(id).set(user);
 
     //Send the URI of new User
-    var uri = "http://localhost:3000/" + ROUTE + "/" + id;
+    let uri = "http://localhost:3000/" + ROUTE + "/" + id;
 
     res.set('location',uri);
     res.json(user);
@@ -37,14 +37,14 @@ router.get('/', function (req, res) {
     getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
 router.get('/:uid' ,function (req, res) {
-    var userId = req.params.uid;
+    let userId = req.params.uid;
     getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
 //PUT-------------------------------------------------------------------
 router.put('/:uid' ,function (req, res) {
-    var userId = req.params.uid;
-    var newUser = req.body;
+    let userId = req.params.uid;
+    let newUser = req.body;
 
     getDokumentAsJSON(ROUTE,userId).then(result =>{
 
@@ -57,7 +57,7 @@ router.put('/:uid' ,function (req, res) {
 
 //DELETE----------------------------------------------------------------
 router.delete('/:uid' ,function (req, res) {
-    var userId = req.params.uid;
+    let userId = req.params.uid;
     db.collection(ROUTE).doc(userId).delete();
     res.send(userId+' was deleted');
 });
@@ -70,16 +70,16 @@ module.exports = router;
  ************************************************************************/
 
 function getIdInCollection(collectionName) {
-    var ref = db.collection(collectionName).doc();
-    var id = ref.id;
+    let ref = db.collection(collectionName).doc();
+    let id = ref.id;
 
     return id;
 }
 function getCollectionAsJSON(collectionName) {
     return new Promise(function (resolve) {
-        var json = {};
+        let json = {};
 
-        var collection = db.collection(collectionName);
+        let collection = db.collection(collectionName);
         collection.get()
             .then(snapshot => {
                 snapshot.forEach(doc => {
@@ -93,9 +93,9 @@ function getCollectionAsJSON(collectionName) {
 }
 function getDokumentAsJSON(collectionName,docName) {
     return new Promise(function (resolve) {
-        var json = {};
+        let json = {};
 
-        var document = db.collection(collectionName).doc(docName);
+        let document = db.collection(collectionName).doc(docName);
         document.get()
             .then(doc => {
                 json = doc.data();
