@@ -123,7 +123,7 @@ router.post('/:eid/wishes', function (req, res) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
-    if(wish.user == null) {
+    if(req.body.user == null) {
         res.status(400).send('No valid User ID!');
         return;
     }
