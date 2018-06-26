@@ -41,6 +41,23 @@ router.get('/:uid' ,function (req, res) {
     getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
+/*router.get('/:uid/events' ,function (req, res) {
+    let userId = req.params.uid;
+
+    db.collection("events").get().then(snapshot => {
+        snapshot.forEach(event => {
+
+            db.collection("events").doc(event.id).collection("users").where('id', '==', userId).get().then(snapshot => {
+                snapshot.forEach(user => {
+
+                });
+
+        });
+    });
+
+    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
+});
+*/
 //PUT-------------------------------------------------------------------
 router.put('/:uid' ,function (req, res) {
     let userId = req.params.uid;
@@ -61,6 +78,7 @@ router.delete('/:uid' ,function (req, res) {
     db.collection(ROUTE).doc(userId).delete();
     res.send(userId+' was deleted');
 });
+
 
 //Export as Module
 module.exports = router;
