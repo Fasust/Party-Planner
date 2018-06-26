@@ -28,7 +28,7 @@ console.log(
             createNewEvent();
             break;
         case 1:
-            addWish();
+            creatNewWish();
             break;
 
     }
@@ -74,7 +74,7 @@ function createNewEvent() {
 
 
 }
-function addWish() {
+function creatNewWish() {
 
     //Dialog------------------------------------------
     console.log("These ar all "+chalk.red("users")+"\n");
@@ -91,9 +91,53 @@ function addWish() {
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
             let eventID = readlineSync.question('where do you want to add new Wishes?\nEventId: ');
+
+            console.log("Enter the Wishes you You Want to add to this Event (Press ENTER on empty input to Abort)");
+
+            let caseSwitch = "nameCase";
+            let name;
+            let location;
+
+
+            while (true) {
+                switch (caseSwitch){
+                    case "nameCase":
+                        name =  readlineSync.question('name: ');
+                        if(name == ""){
+                            return;
+                        }
+                        caseSwitch = "locCase";
+                        break;
+                    case "locCase":
+                        location =  readlineSync.question('location: ');
+                        if(location == ""){
+                            return;
+                        }
+
+                        postWish(eventID,userID,name,location);
+
+                        caseSwitch = "nameCase";
+                        break;
+                }
+
+            }
         });
     });
 
+}
+function postWish(eventID,userID,name,location) {
+    //Build base Options
+    let options = {
+        method: 'POST',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/wishes',
+        body :
+            {'name' : name,
+            'location': location,
+            'user': userID},
+        json: true, // Automatically stringifies the body to JSON
+        resolveWithFullResponse: true
+    };
+    rp(options);
 }
 function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
