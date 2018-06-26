@@ -2,14 +2,15 @@
  * Load modules
  ************************************************************************/
 
-//firestore
+// Init Firestore
 const admin = require("firebase-admin");
 const db = admin.firestore();
 
-//Express
+// Init Express
 const express = require('express');
 const router = express.Router(null);
 
+// Init Route
 const ROUTE = "users";
 
 /************************************************************************
