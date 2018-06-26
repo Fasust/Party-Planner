@@ -77,16 +77,20 @@ function createNewEvent() {
 function addWish() {
 
     //Dialog------------------------------------------
-    console.log("As which "+chalk.red("user")+" do you want to act?\n");
+    console.log("These ar all "+chalk.red("users")+"\n");
 
     getAllUsers().then(function (users) {
         console.log(chalk.red("--------------------------------------"));
         console.log(users);
         console.log(chalk.red("--------------------------------------"));
-        let userID = readlineSync.question('What is it\'s user ID? ');
+        let userID = readlineSync.question('as which one do you want to act?\nUserId: ');
 
         getEventsOfUser(userID).then(function (events) {
-            
+            console.log("These are all your "+chalk.blue("Events")+"\n");
+            console.log(chalk.blue("--------------------------------------"));
+            console.log(events);
+            console.log(chalk.blue("--------------------------------------"));
+            let eventID = readlineSync.question('where do you want to add new Wishes?\nEventId: ');
         });
     });
 
@@ -94,7 +98,7 @@ function addWish() {
 function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
         let options = {
-            uri: DIENST_GEBER + '/users' + userId + '/events',
+            uri: DIENST_GEBER + '/users/' + userId + '/events',
             headers: {
                 'User-Agent': 'Request-Promise'
             },
