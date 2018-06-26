@@ -5,55 +5,51 @@
  ************************************************************************/
 
 const rp = require('request-promise');
+const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
 const DIENST_GEBER = 'http://localhost:3000';
+selectOptions = ['Create New Event','Add Wish'];
 
 /************************************************************************
  * Main
  ************************************************************************/
 
-console.log('-------------------------\n' +
+console.log(
+    chalk.magenta('-------------------------\n') +
     '- Welcome to the Worlds -\n' +
-    '-  Greatest Partyplaner -\n' +
-    '-------------------------');
-selectOptions = ['Create New Event'];
-let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
+    '- Greatest Partyplaner  -\n' +
+    chalk.magenta('-------------------------'));
 
-switch (select){
-    case 0:
-        createNewEvent();
-        break;
 
-}
+    let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
+    switch (select){
+        case 0:
+            createNewEvent();
+            break;
+        case 1:
+            addWish();
+            break;
+
+    }
 
 
 /************************************************************************
  * Functions
  ************************************************************************/
-/**
- * Cuts a URI (URL) at its last "/" and returns the second half of the string
- * @param uri a URI as a String
- * @returns {*|string} hopefully an ID
- */
-function uriToID(uri) {
-    let uriArray = uri.split('/');
-    return uriArray[uriArray.length -1];
-}
 
 function createNewEvent() {
     let usersNames = [];
-    let run = true;
+    let eventName;
 
     //Dialog------------------------------------------
-    let eventName = readlineSync.question('What is the Name of your new Event?\n');
+    eventName = readlineSync.question('What is the Name of your new Event?\n');
     console.log("Enter the Names of the People you want to add to the Event (Press ENTER again to Confirm)");
 
     while (run = true) {
         let newName =  readlineSync.question('name: ');
 
         if(newName == ""){
-            run = false;
             break;
         }else {
             usersNames.push(newName);
@@ -69,16 +65,73 @@ function createNewEvent() {
             postUsersToEvent(users,eventlocation);                  //Add Users to Event
 
             //Build Response Text
-            let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
-                +"Sie finden es hier: " + eventlocation
-                + "\n\nDie User : " + JSON.stringify(users) + "\nwurder erstellt und dem Event zugefügt.";
+            let responseMessage =
+                "----------------------------------------------------\n" +
+                "The Event: " + chalk.green(eventName) + " was created\n"+
+                "Event URI: " + chalk.blue(eventlocation) +"\n"+
+                "----------------------------------------------------\n" +
+                "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
             console.log(responseMessage);
         });
     });
 
 
 }
+function addWish() {
 
+    //Dialog------------------------------------------
+    console.log("As which "+chalk.red("user")+" do you want to act?\n");
+
+    getAllUsers().then(function (users) {
+        console.log(chalk.red("--------------------------------------"));
+        console.log(users);
+        console.log(chalk.red("--------------------------------------"));
+        let userID = readlineSync.question('What is it\'s user ID? ');
+    });
+
+}
+function getEventsOfUser(user) {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/events',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+function getAllUsers() {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/users',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+
+}
+/**
+ * Cuts a URI (URL) at its last "/" and returns the second half of the string
+ * @param uri a URI as a String
+ * @returns {*|string} hopefully an ID
+ */
+function uriToID(uri) {
+    let uriArray = uri.split('/');
+    return uriArray[uriArray.length -1];
+}
 /**
  * Takes an Array of Names and Posts each on as a new User
  * @param userNames Array of names
@@ -135,7 +188,6 @@ function postEvent(eventName) {
         rp(options).then(function (rpResponse) {
             //Save Event location
             eventLocation = rpResponse.headers.location;
-            console.log("Event Location in Event Promise: " + eventLocation);
             resolve(eventLocation);
         });
     });
@@ -154,15 +206,12 @@ function postUsersToEvent(userIDs, eventlocation) {
         json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true
     };
-    console.log("Eventlocation in User to Event " +options.uri);
-
     return new Promise((resolve, reject) => {  //Build Promise
 
         for (let key in userIDs){ //Iterate through all User names in req
 
             let userName = key;
             let userID = userIDs[key];
-            console.log(key +" | " + userID);
 
             options.body = {'user': uriToID(userID)}; //Get Id of each User
             rp(options); //Send
