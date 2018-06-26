@@ -24,7 +24,7 @@ const ROUTE_USER = "users";
 router.post('/', function (req, res) {
 
     // Error handler - start
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
@@ -64,7 +64,7 @@ router.put('/:eid' ,function (req, res) {
         res.status(400).send('No valid Event ID!');
         return;
     }
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this PUT!');
         return;
     }
@@ -119,7 +119,7 @@ router.get('/:eid/wishes/:wid', function (req, res) {
 router.post('/:eid/wishes', function (req, res) {
 
     // Error handler - start
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
@@ -153,7 +153,7 @@ router.post('/:eid/wishes', function (req, res) {
 router.put('/:eid/wishes/:wid' ,function (req, res) {
 
     // Error handler - start
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this PUT!');
         return;
     }
@@ -222,7 +222,7 @@ router.get('/:eid/users/:uid', function (req, res) {
 router.post('/:eid/users', function (req, res) {
 
     // Error handler - start
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
@@ -255,7 +255,7 @@ router.post('/:eid/users', function (req, res) {
 router.put('/:eid/users/:uid' ,function (req, res) {
 
     // Error handler - start
-    if(req.body = {}) {
+    if(req.body == {}) {
         res.status(400).send('Missing Body in this PUT!');
         return;
     }
