@@ -55,9 +55,6 @@ function createNewEvent() {
             usersNames.push(newName);
         }
     }
-    console.log("Starting Logic");
-    console.log(usersNames.toString());
-
 
     //Logic-------------------------------------------
     postUsers(usersNames).then(function (users) {  //Create new Useres for each name

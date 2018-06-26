@@ -241,12 +241,18 @@ router.post('/:eid/users', function (req, res) {
     let userID = user.user;
     let eventID = req.params.eid;
     let route = ROUTE + "/" + eventID + "/" + ROUTE_USER;
+    let uri = "http://localhost:3000/" + route + "/" + userID;
 
     // POST it in Firebase
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(user);
 
+    //Saving User in Event Document
+    //This Thechnically not Restconform, but a neccecarity, due to firestores lack of complex querrys (See Documentation for more details)
+    db.collection('events').doc(eventID).update({
+        ['users.'+userID]: uri
+    });
+
     // Send the URI of new event
-    let uri = "http://localhost:3000/" + route + "/" + userID;
     res.set('location',uri);
     res.json(user);
 });
@@ -287,6 +293,13 @@ router.delete('/:eid/users/:uid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
     let userID = req.params.uid;
+
+    //Removing User from Event Document
+    //This Thechnically not Restconform, but a neccecarity, due to firestores lack of complex querrys (See Documentation for more details)
+    getDokumentAsJSON(ROUTE, eventID).then(event =>{
+        delete event.users[userID];
+        db.collection(ROUTE).doc(eventID).set(event);
+    });
 
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).delete();
     res.send(userID+' was removed from Event: ' + eventID);
