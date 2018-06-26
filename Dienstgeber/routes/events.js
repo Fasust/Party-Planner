@@ -22,6 +22,13 @@ const ROUTE_USER = "users";
 //POST-------------------------------------------------------------------
 router.post('/', function (req, res) {
 
+    // Error handler - start
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this POST!');
+        return;
+    }
+    // Error handler - end
+
     let event = req.body; //JSON in Body
 
     let eventID = getIdInCollection(ROUTE);
@@ -48,6 +55,18 @@ router.get('/:eid' ,function (req, res) {
 
 //PUT-------------------------------------------------------------------
 router.put('/:eid' ,function (req, res) {
+
+    // Error handler - start
+    if(req.params.eid = null) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this PUT!');
+        return;
+    }
+    // Error handler - end
+
     let eventID = req.params.eid;
     let newEvent = req.body;
 
@@ -89,6 +108,21 @@ router.get('/:eid/wishes/:wid', function (req, res) {
 
 router.post('/:eid/wishes', function (req, res) {
 
+    // Error handler - start
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this POST!');
+        return;
+    }
+    if(wish.user = null) {
+        res.status(404).send('No valid User ID!');
+        return;
+    }
+    if(req.params.eid = null) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    // Error handler - end
+
     let wish = req.body; //JSON in Body
     let userID = wish.user;
     let eventID = req.params.eid;
@@ -107,6 +141,26 @@ router.post('/:eid/wishes', function (req, res) {
 
 //PUT------------------------------------------------------------------
 router.put('/:eid/wishes/:wid' ,function (req, res) {
+
+    // Error handler - start
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this PUT!');
+        return;
+    }
+    if(req.body.user = null) {
+        res.status(404).send('No valid User ID!');
+        return;
+    }
+    if(req.params.eid = null) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    if(req.params.wid = null) {
+        res.status(404).send('No valid Wish ID!');
+        return;
+    }
+    // Error handler - end
+
     let eventID = req.params.eid;
     let wishID = req.params.wid;
     let newWish = req.body;
@@ -150,6 +204,21 @@ router.get('/:eid/users/:uid', function (req, res) {
 
 router.post('/:eid/users', function (req, res) {
 
+    // Error handler - start
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this POST!');
+        return;
+    }
+    if(req.body.user = null) {
+        res.status(404).send('No valid User ID!');
+        return;
+    }
+    if(req.params.eid = null) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    // Error handler - end
+
     let user = req.body; //JSON in Body
     let userID = user.user;
     let eventID = req.params.eid;
@@ -166,6 +235,22 @@ router.post('/:eid/users', function (req, res) {
 
 //PUT------------------------------------------------------------------
 router.put('/:eid/users/:uid' ,function (req, res) {
+
+    // Error handler - start
+    if(req.body = {}) {
+        res.status(404).send('Missing Body in this PUT!');
+        return;
+    }
+    if(req.params.uid = null) {
+        res.status(404).send('No valid User ID!');
+        return;
+    }
+    if(req.params.eid = null) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    // Error handler - end
+
     let eventID = req.params.eid;
     let userID = req.params.uid;
     let newUser = req.body;
@@ -206,7 +291,30 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
 
 //POST-------------------------------------------------------------------
 router.post('/:eid/shoppinglist', function (req, res) {
+
     let eventID = req.params.eid;
+
+    // Test for the existence of certain keys within a DataSnapshot;
+    db.collection(ROUTE).once(eventID)
+        .then(function(snapshot) {
+            var idExists = snapshot.exists();
+            if(idExists == false ) {
+                res.status(404).send('Event ID doesnt exist!');
+                return;
+            }
+        });
+
+
+
+
+    // Error handler - start
+    if(req.params.eid = null || idExists  ) {
+        res.status(404).send('No valid Event ID!');
+        return;
+    }
+    // Error handler - end
+
+
     //GET all WISHES in EVENT
     wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
