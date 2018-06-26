@@ -84,13 +84,17 @@ function addWish() {
         console.log(users);
         console.log(chalk.red("--------------------------------------"));
         let userID = readlineSync.question('What is it\'s user ID? ');
+
+        getEventsOfUser(userID).then(function (events) {
+            
+        });
     });
 
 }
-function getEventsOfUser(user) {
+function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
         let options = {
-            uri: DIENST_GEBER + '/events',
+            uri: DIENST_GEBER + '/users' + userId + '/events',
             headers: {
                 'User-Agent': 'Request-Promise'
             },

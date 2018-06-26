@@ -51,7 +51,7 @@ router.get('/:uid/events' ,function (req, res) {
             let resJson = {};
             events.forEach(eve => {
 
-                resJson[eve.id] = eve.data();
+                resJson[eve.id] = eve.data().name;
             });
             res.json(resJson);
         });
