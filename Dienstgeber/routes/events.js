@@ -294,21 +294,15 @@ router.post('/:eid/shoppinglist', function (req, res) {
 
     let eventID = req.params.eid;
 
-    // Test for the existence of certain keys within a DataSnapshot;
-    db.collection(ROUTE).once(eventID)
-        .then(function(snapshot) {
-            var idExists = snapshot.exists();
-            if(idExists == false ) {
-                res.status(404).send('Event ID doesnt exist!');
-                return;
-            }
-        });
-
-
-
-
     // Error handler - start
-    if(req.params.eid = null || idExists  ) {
+    checkIfDocInCollection(ROUTE,eventID).then(function (result) {
+        if (result == false) {
+            res.status(404).send('Event ID does not exist!');
+            return;
+        }
+    });
+
+    if(req.params.eid = null ) {
         res.status(404).send('No valid Event ID!');
         return;
     }
@@ -401,7 +395,7 @@ function getCollectionAsJSON(collectionName) {
 /**
  * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
  * @param collectionName name of the collection
- * @param docName name of the documeten
+ * @param docName name of the document
  * @returns {Promise<any>} Promise that resolves as JSON
  */
 function getDokumentAsJSON(collectionName,docName) {
@@ -416,5 +410,22 @@ function getDokumentAsJSON(collectionName,docName) {
             }).then(function () {
             resolve(json);
         });
+    });
+}
+
+/**
+ * Returns a Promise that is to be resolved as a boolean that shows us if a ID exists in a collection
+ * @param collectionName name of the collection
+ * @param docName name of the document
+ * @returns {Promise<any>} Promise that resolves as bool
+ */
+function checkIfDocInCollection(collectionName, docName) {
+    return new Promise(function (resolve) {
+        // Test for the existence of certain keys within a DataSnapshot;
+        db.collection(collectionName).once(docName)
+            .then(function(snapshot) {
+                let idExists = snapshot.exists();
+                resolve(idExists);
+            });
     });
 }
