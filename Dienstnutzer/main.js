@@ -4,74 +4,33 @@
  * Load modules
  ************************************************************************/
 
-const request = require('request');
 const rp = require('request-promise');
+const readlineSync = require('readline-sync');
 
-//Express
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
-
-const PORT = 4000;
 const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main
  ************************************************************************/
 
-initExpress();
+console.log('-------------------------\n' +
+    '- Welcome to the Worlds -\n' +
+    '-  Greatest Partyplaner -\n' +
+    '-------------------------');
+selectOptions = ['Create New Event'];
+let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
 
-app.post('/events', function (req, res) {
+switch (select){
+    case 0:
+        createNewEvent();
+        break;
 
-    //GET Data from reg------------------------------------
-    let usersNames = req.body.users; //Get list of user Names
-    let eventName = req.body.name; //Get Event Name
-
-
-    postUsers(usersNames).then(function (users) {
-        postEvent(eventName).then(function (eventlocation) {
-            postUsersToEvent(users,eventlocation);
-
-            let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
-                +"Sie finden es hier: " + eventlocation
-            + "\n\nDie User : " + JSON.stringify(users) + "\nwurder erstellt und dem Event zugefügt.";
-
-            res.send(responseMessage); //send Response
-        });
-    });
-
-});
-
+}
 
 
 /************************************************************************
  * Functions
  ************************************************************************/
-/**
- * Initalize Express: Listen on Port, Init Log, init Erro Handling
- */
-function initExpress() {
-
-    app.listen(PORT, function () {
-        console.log('--Listening on port 4000--');
-    });
-
-    //Error Handler
-    app.use(function(err, req, res, next) {
-        console.error(err.stack);
-        res.status(500).send('Something broke!');
-    });
-
-    //Log
-    app.use(function(req, res, next) {
-        console.log("Time: \t" + Date.now() + "\t| Request-path:\t" + req.path);
-        next();
-    });
-}
 /**
  * Cuts a URI (URL) at its last "/" and returns the second half of the string
  * @param uri a URI as a String
@@ -80,6 +39,44 @@ function initExpress() {
 function uriToID(uri) {
     let uriArray = uri.split('/');
     return uriArray[uriArray.length -1];
+}
+
+function createNewEvent() {
+    let usersNames = [];
+    let run = true;
+
+    //Dialog------------------------------------------
+    let eventName = readlineSync.question('What is the Name of your new Event?\n');
+    console.log("Enter the Names of the People you want to add to the Event (Press ENTER again to Confirm)");
+
+    while (run = true) {
+        let newName =  readlineSync.question('name: ');
+
+        if(newName == ""){
+            run = false;
+            break;
+        }else {
+            usersNames.push(newName);
+        }
+    }
+    console.log("Starting Logic");
+    console.log(usersNames.toString());
+
+
+    //Logic-------------------------------------------
+    postUsers(usersNames).then(function (users) {  //Create new Useres for each name
+        postEvent(eventName).then(function (eventlocation) {  //Create Event with given name
+            postUsersToEvent(users,eventlocation);                  //Add Users to Event
+
+            //Build Response Text
+            let responseMessage = "Das Event: " + eventName + " wurde erstellt\n"
+                +"Sie finden es hier: " + eventlocation
+                + "\n\nDie User : " + JSON.stringify(users) + "\nwurder erstellt und dem Event zugefügt.";
+            console.log(responseMessage);
+        });
+    });
+
+
 }
 
 /**
