@@ -17,7 +17,7 @@ const ROUTE = "users";
  * Main
  ************************************************************************/
 
-//POST-------------------------------------------------------------------
+//POST------------------------------------------------------------------
 router.post('/', function (req, res) {
 
     let user = req.body //JSON in Body
@@ -42,14 +42,19 @@ router.get('/:uid' ,function (req, res) {
     getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
-/**
- * This Get will Return all events a user participates in
- * Sadly Firestore dose not Handle complex querrys well, so this is a little bit of a work around.
- * We Need to load all Events with all there useres into memory and then serach throgh them.
- */
+//Get all events of a user
 router.get('/:uid/events' ,function (req, res) {
     let userId = req.params.uid;
 
+    db.collection("events").where('users.'+userId, '>', '').get()
+        .then(events => {
+            let resJson = {};
+            events.forEach(eve => {
+
+                resJson[eve.id] = eve.data();
+            });
+            res.json(resJson);
+        });
 });
 
 //PUT-------------------------------------------------------------------
