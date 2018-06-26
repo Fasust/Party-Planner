@@ -24,7 +24,7 @@ router.post('/', function (req, res) {
 
     // Error handler - start
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this POST!');
+        res.status(400).send('Missing Body in this POST!');
         return;
     }
     // Error handler - end
@@ -57,12 +57,12 @@ router.get('/:eid' ,function (req, res) {
 router.put('/:eid' ,function (req, res) {
 
     // Error handler - start
-    if(req.params.eid = null) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this PUT!');
+        res.status(400).send('Missing Body in this PUT!');
         return;
     }
     // Error handler - end
@@ -110,15 +110,15 @@ router.post('/:eid/wishes', function (req, res) {
 
     // Error handler - start
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this POST!');
+        res.status(400).send('Missing Body in this POST!');
         return;
     }
-    if(wish.user = null) {
-        res.status(404).send('No valid User ID!');
+    if(wish.user == null) {
+        res.status(400).send('No valid User ID!');
         return;
     }
-    if(req.params.eid = null) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
     // Error handler - end
@@ -144,19 +144,19 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
 
     // Error handler - start
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this PUT!');
+        res.status(400).send('Missing Body in this PUT!');
         return;
     }
-    if(req.body.user = null) {
-        res.status(404).send('No valid User ID!');
+    if(req.body.user == null) {
+        res.status(400).send('No valid User ID!');
         return;
     }
-    if(req.params.eid = null) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
-    if(req.params.wid = null) {
-        res.status(404).send('No valid Wish ID!');
+    if(req.params.wid == null) {
+        res.status(400).send('No valid Wish ID!');
         return;
     }
     // Error handler - end
@@ -206,15 +206,15 @@ router.post('/:eid/users', function (req, res) {
 
     // Error handler - start
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this POST!');
+        res.status(400).send('Missing Body in this POST!');
         return;
     }
-    if(req.body.user = null) {
-        res.status(404).send('No valid User ID!');
+    if(req.body.user == null) {
+        res.status(400).send('No valid User ID!');
         return;
     }
-    if(req.params.eid = null) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
     // Error handler - end
@@ -238,15 +238,15 @@ router.put('/:eid/users/:uid' ,function (req, res) {
 
     // Error handler - start
     if(req.body = {}) {
-        res.status(404).send('Missing Body in this PUT!');
+        res.status(400).send('Missing Body in this PUT!');
         return;
     }
-    if(req.params.uid = null) {
-        res.status(404).send('No valid User ID!');
+    if(req.params.uid == null) {
+        res.status(400).send('No valid User ID!');
         return;
     }
-    if(req.params.eid = null) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
     // Error handler - end
@@ -297,13 +297,13 @@ router.post('/:eid/shoppinglist', function (req, res) {
     // Error handler - start
     checkIfDocInCollection(ROUTE,eventID).then(function (result) {
         if (result == false) {
-            res.status(404).send('Event ID does not exist!');
+            res.status(400).send('Event ID does not exist!');
             return;
         }
     });
 
-    if(req.params.eid = null ) {
-        res.status(404).send('No valid Event ID!');
+    if(req.params.eid == null ) {
+        res.status(400).send('No valid Event ID!');
         return;
     }
     // Error handler - end
@@ -412,7 +412,6 @@ function getDokumentAsJSON(collectionName,docName) {
         });
     });
 }
-
 /**
  * Returns a Promise that is to be resolved as a boolean that shows us if a ID exists in a collection
  * @param collectionName name of the collection
