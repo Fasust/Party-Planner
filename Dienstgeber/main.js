@@ -4,7 +4,7 @@
  * Load modules
  ************************************************************************/
 
-//firestore
+// Init Firestore
 const fs = require('fs');
 const admin = require("firebase-admin");
 const serviceAccount = require("../wba2ftsKey.json");
@@ -14,7 +14,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-//Express
+// Init Express
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 const PORT = 3000;
 
-//Routes
+// Init Route
 const usersRouter = require('./routes/users');
 const eventsRouter = require('./routes/events');
 
@@ -54,7 +54,7 @@ setRoutes();
  * Functions
  ************************************************************************/
 /**
- * Initalize Express: Listen on Port, Init Log, init Erro Handling
+ * Initialize Express: Listen on Port, Init Log, init Error Handling
  */
 function initExpress() {
 
@@ -62,20 +62,20 @@ function initExpress() {
         console.log('--Listening on port 3000--');
     });
 
-    //Error Handler
+    // Error Handler
     app.use(function(err, req, res, next) {
         console.error(err.stack);
         res.status(500).send('Something broke!');
     });
 
-    //Log
+    // Log with Timestamp and Request Path
     app.use(function(req, res, next) {
         console.log("Time: \t" + Date.now() + "\t| Request-path:\t" + req.path);
         next();
     });
 }
 /**
- * Set Express Routes Users, Events
+ * Set Express Routes Users and Events
  */
 function setRoutes() {
     app.use('/users',usersRouter);

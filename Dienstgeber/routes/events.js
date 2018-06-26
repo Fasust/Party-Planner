@@ -2,14 +2,15 @@
  * Init-Modules
  ************************************************************************/
 
-//init firestore module
+// Init Firestore
 const admin = require("firebase-admin");
 const db = admin.firestore();
 
-//init express module
+// Init Express
 const express = require("express");
 const router = express.Router(null);
 
+// Init Route
 const ROUTE = "events";
 const ROUTE_WISH = "wishes";
 const ROUTE_SHOP = "shoppinglist";
