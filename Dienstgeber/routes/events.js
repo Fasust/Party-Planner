@@ -372,51 +372,72 @@ router.post('/:eid/shoppinglist', function (req, res) {
 
 
     //GET all WISHES in EVENT
-    wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
+    let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
-    userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
+    let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
 
-    userCollection.get()
-        .then(users => {
 
-            //GET all user Ids in Event
-            userIDs = {};
-            let userIndex = 0;
-            users.forEach(user => {
-                userIDs[userIndex] = user.id;
-                userIndex++;
-            });
 
-            wishCollection.get()
-                .then(wishes => {
-                    let previosLocation = "";
-                    let currentLocation = "";
+    //Save all User Ids in an Array and Return it
+    let userIDs = {};
+    new Promise(function (resolve) {
+        userCollection.get()
+            .then(users => {
 
-                    let index = 0;
-
-                    //Match Wishes by Location
-                    wishes.forEach(wish => {
-                        currentLocation = wish.data().location;
-                        if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                            if(index == userIDs.size) {
-                                index = 0
-                            }else{
-                                index++;
-                            }
-                        }
-                        //Turn Wish and user IDs to URIS
-                        let wishURI = req.protocol + '://' + req.get('host') + "/events/" + eventID + "/wishes/" + wish.id;
-                        let userURI = req.protocol + '://' + req.get('host') + "/users/"  + userIDs[index];
-
-                        //add result to firestore
-                        db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wishURI,"user" : userURI});
-                        previosLocation = currentLocation;
-                    });
-                    //Send Result
-                    getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
+                //GET all user Ids in Event
+                let userIndex = 0;
+                users.forEach(user => {
+                    userIDs[userIndex] = user.id;
+                    userIndex++;
                 });
+            }).then(function () {
+
+                resolve(userIDs);
             });
+    }).then(function () {
+
+        wishCollection.get()
+            .then(wishes => {
+                let previosLocation = "";
+                let currentLocation = "";
+
+                let index = 0;
+
+                //Match Wishes by Location
+                wishes.forEach(wish => {
+                    currentLocation = wish.data().location;
+                    if(currentLocation != previosLocation){ // if more locations than users, loop back around
+                        if(index == userIDs.size) {
+                            index = 0;
+                        }else{
+                            index++;
+                            console.log("---------------------");
+                            console.log("location: " + currentLocation);
+                        }
+                    }
+
+                    //Turn Wish and user IDs to URIS
+                    let wishURI = req.protocol + '://' + req.get('host') + "/events/" + eventID + "/wishes/" + wish.id;
+                    let userURI = req.protocol + '://' + req.get('host') + "/users/"  + userIDs[index];
+                    console.log("user: " + userIDs[index]+" -> Was Matched to: " + wish.data().name);
+
+                    //add result to firestore
+                    let entry = {
+                        "wish" : {
+                            "uri" : wishURI,
+                            "location" : wish.data().location,
+                            "name" : wish.data().name
+                        },
+                        "user" : userURI
+                    };
+                    db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
+                    previosLocation = currentLocation;
+                });
+                //Send Result
+                getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
+            });
+    });
 });
 
 //Export as Module

@@ -59,16 +59,18 @@ function createNewEvent() {
     //Logic-------------------------------------------
     postUsers(usersNames).then(function (users) {  //Create new Useres for each name
         postEvent(eventName).then(function (eventlocation) {  //Create Event with given name
-            postUsersToEvent(users,eventlocation);                  //Add Users to Event
+            postUsersToEvent(users,eventlocation).then(function () { //Add Users to Event
 
-            //Build Response Text
-            let responseMessage =
-                "----------------------------------------------------\n" +
-                "The Event: " + chalk.green(eventName) + " was created\n"+
-                "Event URI: " + chalk.blue(eventlocation) +"\n"+
-                "----------------------------------------------------\n" +
-                "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
-            console.log(responseMessage);
+                //Build Response Text
+                let responseMessage =
+                    "----------------------------------------------------\n" +
+                    "The Event: " + chalk.green(eventName) + " was created\n"+
+                    "Event URI: " + chalk.blue(eventlocation) +"\n"+
+                    "----------------------------------------------------\n" +
+                    "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
+
+                console.log(responseMessage);
+            });
         });
     });
 
@@ -243,11 +245,11 @@ function postEvent(eventName) {
 }
 /**
  * Adds multiple users to given Event
- * @param userIDs JSON of User names that map to their IDs (Return of "postUsers")
+ * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
  * @param eventlocation URI of Event
  * @returns {Promise<any>}
  */
-function postUsersToEvent(userIDs, eventlocation) {
+function postUsersToEvent(userURIs, eventlocation) {
 
     let options = {
         method: 'POST',
@@ -257,13 +259,17 @@ function postUsersToEvent(userIDs, eventlocation) {
     };
     return new Promise((resolve, reject) => {  //Build Promise
 
-        for (let key in userIDs){ //Iterate through all User names in req
+        for (let key in userURIs){ //Iterate through all User names in req
 
             let userName = key;
-            let userID = userIDs[key];
+            let userURI = userURIs[key];
 
-            options.body = {'user': uriToID(userID)}; //Get Id of each User
-            rp(options); //Send
+            options.body = {'user': uriToID(userURI)}; //Get Id of each User
+
+
+            rp(options);
+            console.log(options.body);
+
         }
         resolve();
     });
