@@ -39,7 +39,7 @@ router.post('/', function (req, res) {
     db.collection(ROUTE).doc(eventID).set(event);
 
     // Send the URI of new event
-    let uri = "http://localhost:3000/" + ROUTE + "/" + eventID;
+    let uri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID;
     res.set('location',uri);
     res.json(event);
 });
@@ -141,7 +141,7 @@ router.post('/:eid/wishes', function (req, res) {
     db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
 
     // Send the URI of new event
-    let uri = "http://localhost:3000/" + route + "/" + wishID;
+    let uri = req.protocol + '://' + req.get('host') + req.originalUrl +"/" + wishID;
     res.set('location',uri);
     res.json(wish);
 });
@@ -232,8 +232,8 @@ router.post('/:eid/users', function (req, res) {
     let user = req.body; //JSON in Body
     let userID = user.user;
     let eventID = req.params.eid;
-    let route = ROUTE + "/" + eventID + "/" + ROUTE_USER;
-    let uri = "http://localhost:3000/" + route + "/" + userID;
+
+    let uri = req.protocol + '://' + req.get('host') + "/users/" +userID;
 
     // POST it in Firebase
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(user);
@@ -271,14 +271,16 @@ router.put('/:eid/users/:uid' ,function (req, res) {
     let eventID = req.params.eid;
     let userID = req.params.uid;
     let newUser = req.body;
+    let userName = newUser.name;
 
+    let userUri = req.protocol + '://' + req.get('host') + "/users/" + userID;
 
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
 
     //Saving User in Event Document
     //This Thechnically not Restconform, but a neccecarity, due to firestores lack of complex querrys (See Documentation for more details)
     db.collection('events').doc(eventID).update({
-        ['users.'+userID]: "http://localhost:3000/" + ROUTE_USER +"/" + userID
+        ['users.'+userID]: userUri
     });
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });

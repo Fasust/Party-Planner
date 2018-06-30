@@ -27,9 +27,9 @@ router.post('/', function (req, res) {
     db.collection(ROUTE).doc(id).set(user);
 
     //Send the URI of new User
-    let uri = "http://localhost:3000/" + ROUTE + "/" + id;
+    var userURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+id;
 
-    res.set('location',uri);
+    res.set('location',userURI);
     res.json(user);
 });
 
