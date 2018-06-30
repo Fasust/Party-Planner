@@ -402,19 +402,21 @@ router.post('/:eid/shoppinglist', function (req, res) {
                 let previosLocation = "";
                 let currentLocation = "";
 
-                let index = 0;
+                let index = -1;
 
                 //Match Wishes by Location
                 wishes.forEach(wish => {
                     currentLocation = wish.data().location;
                     if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                        if(index == userIDs.size) {
+                        if(index >= Object.keys(userIDs).length-1) {
+                            console.log("\n> New Iteration");
                             index = 0;
                         }else{
                             index++;
-                            console.log("---------------------");
-                            console.log("location: " + currentLocation);
+
                         }
+                        console.log("---------------------");
+                        console.log("location: " + currentLocation);
                     }
 
                     //Turn Wish and user IDs to URIS
