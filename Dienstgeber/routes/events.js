@@ -134,8 +134,11 @@ router.post('/:eid/wishes', function (req, res) {
     let wish = req.body; //JSON in Body
     let userID = wish.user;
     let eventID = req.params.eid;
-    let route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
-    let wishID = getIdInCollection(route);
+    let wishID = getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+
+    //Change User ID to URI
+    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+    wish.user = userURI;
 
     // POST it in Firebase
     db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
@@ -172,6 +175,11 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     let eventID = req.params.eid;
     let wishID = req.params.wid;
     let newWish = req.body;
+    let userID = newWish.user;
+
+    //Change User ID to URI
+    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+    newWish.user = userURI;
 
     db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
@@ -233,7 +241,10 @@ router.post('/:eid/users', function (req, res) {
     let userID = user.user;
     let eventID = req.params.eid;
 
-    let uri = req.protocol + '://' + req.get('host') + "/users/" +userID;
+    let uri = req.protocol + '://' + req.get('host') + "/users/" + userID;
+
+    //Chage User ID to URI
+    user.user = uri;
 
     // POST it in Firebase
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(user);
@@ -271,9 +282,11 @@ router.put('/:eid/users/:uid' ,function (req, res) {
     let eventID = req.params.eid;
     let userID = req.params.uid;
     let newUser = req.body;
-    let userName = newUser.name;
 
     let userUri = req.protocol + '://' + req.get('host') + "/users/" + userID;
+
+    //Change UserID to URI
+    newUser.user = userID;
 
     db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
 
@@ -377,8 +390,12 @@ router.post('/:eid/shoppinglist', function (req, res) {
                                 index++;
                             }
                         }
+                        //Turn Wish and user IDs to URIS
+                        let wishURI = req.protocol + '://' + req.get('host') + "/events/" + eventID + "/wishes/" + wish.id;
+                        let userURI = req.protocol + '://' + req.get('host') + "/users/"  + userIDs[index];
+
                         //add result to firestore
-                        db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wish.id,"user" : userIDs[index]});
+                        db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set({"wish" : wishURI,"user" : userURI});
                         previosLocation = currentLocation;
                     });
                     //Send Result
@@ -455,9 +472,9 @@ function getDokumentAsJSON(collectionName,docName) {
 function checkIfDocInCollection(collectionName, docName) {
     return new Promise(function (resolve) {
         // Test for the existence of certain keys within a DataSnapshot;
-        db.collection(collectionName).once(docName)
+        db.collection(collectionName).doc(docName).get()
             .then(function(snapshot) {
-                let idExists = snapshot.exists();
+                let idExists = snapshot.exists;
                 resolve(idExists);
             });
     });
