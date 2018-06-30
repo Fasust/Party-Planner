@@ -424,13 +424,16 @@ router.post('/:eid/shoppinglist', function (req, res) {
 
                     //add result to firestore
                     let entry = {
-                        "wish" : {
-                            "uri" : wishURI,
-                            "location" : wish.data().location,
-                            "name" : wish.data().name
-                        },
+                        "wish" :  wishURI,
                         "user" : userURI
                     };
+                    /* To show more detail in the POST (is redundant)
+                    entry.wish = {
+                        "uri": wishURI,
+                        "location": wish.data().location,
+                        "name": wish.data().name
+                    };
+                    */
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
