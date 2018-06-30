@@ -35,6 +35,17 @@ router.post('/', function (req, res) {
 
     let eventID = getIdInCollection(ROUTE);
 
+    //Adding Links to child domains
+    let wishUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/wishes";
+    let shoppingUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/shoppinglist";
+    let userUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/users";
+    event.navigation = {
+        "users" : userUri,
+        "shoppinglist" : shoppingUri,
+        "wishes" : wishUri
+    };
+
+
     // POST it in Firebase
     db.collection(ROUTE).doc(eventID).set(event);
 
