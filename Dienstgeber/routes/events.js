@@ -74,11 +74,8 @@ router.put('/:eid' ,function (req, res) {
     let eventID = req.params.eid;
     let newEvent = req.body;
 
-    getDokumentAsJSON(ROUTE, eventID).then(result =>{
-            db.collection(ROUTE).doc(eventID).set(newEvent);
-            res.send('Event: ' +eventID+'\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newEvent));
-        }
-    );
+    db.collection(ROUTE).doc(eventID).set(newEvent);
+    getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -175,14 +172,9 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     let eventID = req.params.eid;
     let wishID = req.params.wid;
     let newWish = req.body;
-    let userID = newWish.user;
-    let route = ROUTE + "/" + eventID + "/" + ROUTE_WISH;
 
-    getDokumentAsJSON(route, wishID).then(result =>{
-            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
-            res.send('Wish: ' + wishID +'\nwas set from: \n' + JSON.stringify(result) +'\nto: \n' + JSON.stringify(newWish));
-        }
-    );
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -279,13 +271,16 @@ router.put('/:eid/users/:uid' ,function (req, res) {
     let eventID = req.params.eid;
     let userID = req.params.uid;
     let newUser = req.body;
-    let route = ROUTE + "/" + eventID + "/" + ROUTE_USER;
 
-    getDokumentAsJSON(route, userID).then(result =>{
-            db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
-            res.send('User: ' +userID+'\n in Event '+ eventID + ' was set from: \n' + JSON.stringify(result) +'\nto: \n' + JSON.stringify(newUser));
-        }
-    );
+
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_USER).doc(userID).set(newUser);
+
+    //Saving User in Event Document
+    //This Thechnically not Restconform, but a neccecarity, due to firestores lack of complex querrys (See Documentation for more details)
+    db.collection('events').doc(eventID).update({
+        ['users.'+userID]: "http://localhost:3000/" + ROUTE_USER +"/" + userID
+    });
+    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------

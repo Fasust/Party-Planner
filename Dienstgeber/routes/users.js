@@ -62,13 +62,8 @@ router.put('/:uid' ,function (req, res) {
     let userId = req.params.uid;
     let newUser = req.body;
 
-    getDokumentAsJSON(ROUTE,userId).then(result =>{
-
-            db.collection(ROUTE).doc(userId).set(newUser);
-            res.send('User: ' +userId+'\n\nwas set from: ' + JSON.stringify(result) +'\nto: ' + JSON.stringify(newUser));
-        }
-    );
-
+    db.collection(ROUTE).doc(userId).set(newUser);
+    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
