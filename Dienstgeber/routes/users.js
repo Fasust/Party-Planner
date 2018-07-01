@@ -20,10 +20,17 @@ const ROUTE = "users";
 //POST------------------------------------------------------------------
 router.post('/', function (req, res) {
 
-    let user = req.body //JSON in Body
+    let user = req.body; //JSON in Body
 
     //POST them in Firebase
     let id = getIdInCollection(ROUTE);
+
+    //add subdomains to user
+    let userEventURI = req.protocol + '://' + req.get('host') + req.originalUrl +id + "/events";
+    user.navigation = {
+        "events" : userEventURI
+    };
+
     db.collection(ROUTE).doc(id).set(user);
 
     //Send the URI of new User
@@ -51,7 +58,8 @@ router.get('/:uid/events' ,function (req, res) {
             let resJson = {};
             events.forEach(eve => {
 
-                resJson[eve.id] = eve.data().name;
+                let eventUri= req.protocol + '://' + req.get('host') +  "/events/" + eve.id;
+                resJson[eve.id] = eventUri ;
             });
             res.json(resJson);
         });

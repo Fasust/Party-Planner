@@ -413,7 +413,6 @@ router.post('/:eid/shoppinglist', function (req, res) {
                             index = 0;
                         }else{
                             index++;
-
                         }
                         console.log("---------------------");
                         console.log("location: " + currentLocation);
