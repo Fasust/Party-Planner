@@ -41,13 +41,23 @@ function logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are Now Loged in as "+chalk.red(userID));
     console.log(chalk.magenta("--------------------------------------"));
-    
+
     let selectOptions = ['Create Event','Show your Events','Enter an Event','Add Wish','Finalize the Shopping List for an Event','Get Your Shopping List for an Event'];
     let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
 
     switch (select){
         case 0:
-            createNewEvent();
+            createNewEvent().then(function (location) {
+                let responseMessage =
+                    chalk.blue("----------------------------------------------------\n") +
+                    "The Event Was Created\n: "+
+                    "You can find it here: "+ location + "\n"+
+                    chalk.blue("----------------------------------------------------\n");
+                console.log(responseMessage);
+
+                //Recursion
+                logedIn(userID);
+            });
             break;
         case 1:
             getEventsOfUser(userID).then( function(events){
@@ -55,13 +65,16 @@ function logedIn(userID) {
                 console.log(chalk.blue("-------------------"));
                 console.log(events);
                 console.log(chalk.blue("-------------------"));
+
+                //Recursion
+                logedIn(userID);
             });
             break;
         case 2:
-            enterEvent(userID);
+            enterEvent(userID).then(res => logedIn(userID));
             break;
         case 3:
-            creatNewWish(userID);
+            creatNewWish(userID).then(res => logedIn(userID));
             break;
         case 4:
             //Post shoppinglist
@@ -99,32 +112,35 @@ function register() {
     });
 }
 function createNewEvent() {
-    let eventName = readlineSync.question('What is the Name of your new Event?\n');
-    postEvent(eventName).then(function (location) {
-        let responseMessage =
-            "----------------------------------------------------\n" +
-            "The Event: " + chalk.green(eventName) + " was created\n"+
-            "Event URI: " + chalk.blue(location) +"\n"+
-            "----------------------------------------------------\n";
+    return new Promise(function (resolve) {
+        let eventName = readlineSync.question('What is the Name of your new Event?\n');
+        postEvent(eventName).then(function (location) {
 
-        console.log(responseMessage);
-    });
-}
-function enterEvent(userID) {
-    getAllEvents().then(function (events) {
-        console.log("These are all " + chalk.blue("Events") + "\n");
-        console.log(chalk.blue("--------------------------------------"));
-        console.log(events);
-        console.log(chalk.blue("--------------------------------------"));
-        let eventID = readlineSync.question('which one do you want to join?\nEventId: ');
-        let users = [];
-        users.push(userID);
-        postUsersToEvent(users, eventID).then(function () {
-            console.log("User " + chalk.red(userID) + " has been Added to Event " + chalk.blue(eventID));
+            resolve(location);
         });
     });
+
+}
+function enterEvent(userID) {
+    return new Promise(function (resolve) {
+        getAllEvents().then(function (events) {
+            console.log("These are all " + chalk.blue("Events") + "\n");
+            console.log(chalk.blue("--------------------------------------"));
+            console.log(events);
+            console.log(chalk.blue("--------------------------------------"));
+            let eventID = readlineSync.question('which one do you want to join?\nEventId: ');
+            let users = [];
+            users.push(userID);
+            postUsersToEvent(users, eventID).then(function () {
+                console.log("User " + chalk.red(userID) + " has been Added to Event " + chalk.blue(eventID));
+                resolve();
+            });
+        });
+    });
+
 }
 function creatNewWish(userID) {
+    return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your "+chalk.blue("Events")+"\n");
             console.log(chalk.blue("--------------------------------------"));
@@ -151,7 +167,7 @@ function creatNewWish(userID) {
                     case "locCase":
                         location =  readlineSync.question('location: ');
                         if(location == ""){
-                            return;
+                            resolve();
                         }
 
                         postWish(eventID,userID,name,location);
@@ -162,6 +178,7 @@ function creatNewWish(userID) {
 
             }
         });
+    });
 }
 
 function createNewEventAndAddUsers() {
