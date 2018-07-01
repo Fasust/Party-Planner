@@ -348,10 +348,8 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
 });
 
 //POST-------------------------------------------------------------------
-/*
-This Where The Matching Happens.
-When Posting on events/(id)/shoppinglist we automatically Match all wishes to the Users that are Part of the Event
- */
+/* This Where The Matching Happens.
+When Posting on events/(id)/shoppinglist we automatically Match all wishes to the Users that are Part of the Event */
 router.post('/:eid/shoppinglist', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;

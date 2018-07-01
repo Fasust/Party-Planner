@@ -9,7 +9,6 @@ const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
 const DIENST_GEBER = 'http://localhost:3000';
-selectOptions = ['Create New Event','Add Wish'];
 
 /************************************************************************
  * Main
@@ -21,72 +20,111 @@ console.log(
     '- Greatest Partyplaner  -\n' +
     chalk.magenta('-------------------------'));
 
+let selectOptions = ['Login','Register'];
+let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
 
-    let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
-    switch (select){
-        case 0:
-            createNewEvent();
-            break;
-        case 1:
-            creatNewWish();
-            break;
-
-    }
+switch (select){
+    case 0:
+        login().then( id => logedIn(id));
+        break;
+    case 1:
+        register().then( id => logedIn(id));
+        break;
+}
 
 
 /************************************************************************
  * Functions
  ************************************************************************/
+//Dialoges------------------------------------
+function logedIn(userID) {
+    console.log(chalk.magenta("--------------------------------------"));
+    console.log("You are Now Loged in as "+chalk.red(userID));
+    console.log(chalk.magenta("--------------------------------------"));
+    
+    let selectOptions = ['Create Event','Show your Events','Enter an Event','Add Wish','Finalize the Shopping List for an Event','Get Your Shopping List for an Event'];
+    let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
 
-function createNewEvent() {
-    let usersNames = [];
-    let eventName;
-
-    //Dialog------------------------------------------
-    eventName = readlineSync.question('What is the Name of your new Event?\n');
-    console.log("Enter the Names of the People you want to add to the Event (Press ENTER again to Confirm)");
-
-    while (run = true) {
-        let newName =  readlineSync.question('name: ');
-
-        if(newName == ""){
+    switch (select){
+        case 0:
+            createNewEvent();
             break;
-        }else {
-            usersNames.push(newName);
-        }
-    }
-
-    //Logic-------------------------------------------
-    postUsers(usersNames).then(function (users) {  //Create new Useres for each name
-        postEvent(eventName).then(function (eventlocation) {  //Create Event with given name
-            postUsersToEvent(users,eventlocation).then(function () { //Add Users to Event
-
-                //Build Response Text
-                let responseMessage =
-                    "----------------------------------------------------\n" +
-                    "The Event: " + chalk.green(eventName) + " was created\n"+
-                    "Event URI: " + chalk.blue(eventlocation) +"\n"+
-                    "----------------------------------------------------\n" +
-                    "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
-
-                console.log(responseMessage);
+        case 1:
+            getEventsOfUser(userID).then( function(events){
+                console.log(chalk.blue("Your " + chalk.blue("Events:")));
+                console.log(chalk.blue("-------------------"));
+                console.log(events);
+                console.log(chalk.blue("-------------------"));
             });
+            break;
+        case 2:
+            enterEvent(userID);
+            break;
+        case 3:
+            creatNewWish(userID);
+            break;
+        case 4:
+            //Post shoppinglist
+            break;
+        case 5:
+            //Get My Shoppinglist for event
+            break;
+    }
+}
+function login() {
+    return new Promise(function (resolve) {
+        //Dialog------------------------------------------
+        console.log("These ar all "+chalk.red("users")+"\n");
+
+        getAllUsers().then(function (users) {
+            console.log(chalk.red("--------------------------------------"));
+            console.log(users);
+            console.log(chalk.red("--------------------------------------"));
+            let userID = readlineSync.question('as which one do you want to act?\nUserId: ');
+
+            resolve(userID);
         });
     });
 
-
 }
-function creatNewWish() {
+function register() {
+    return new Promise(function (resolve) {
+        let names = [];
+        let userName = readlineSync.question('What is your Name?\nName: ');
+        names.push(userName);
+        postUsers(names).then(function (json) {
+            console.log(json);
+            resolve(uriToID(json[userName]));
+        });
+    });
+}
+function createNewEvent() {
+    let eventName = readlineSync.question('What is the Name of your new Event?\n');
+    postEvent(eventName).then(function (location) {
+        let responseMessage =
+            "----------------------------------------------------\n" +
+            "The Event: " + chalk.green(eventName) + " was created\n"+
+            "Event URI: " + chalk.blue(location) +"\n"+
+            "----------------------------------------------------\n";
 
-    //Dialog------------------------------------------
-    console.log("These ar all "+chalk.red("users")+"\n");
-
-    getAllUsers().then(function (users) {
-        console.log(chalk.red("--------------------------------------"));
-        console.log(users);
-        console.log(chalk.red("--------------------------------------"));
-        let userID = readlineSync.question('as which one do you want to act?\nUserId: ');
-
+        console.log(responseMessage);
+    });
+}
+function enterEvent(userID) {
+    getAllEvents().then(function (events) {
+        console.log("These are all " + chalk.blue("Events") + "\n");
+        console.log(chalk.blue("--------------------------------------"));
+        console.log(events);
+        console.log(chalk.blue("--------------------------------------"));
+        let eventID = readlineSync.question('which one do you want to join?\nEventId: ');
+        let users = [];
+        users.push(userID);
+        postUsersToEvent(users, eventID).then(function () {
+            console.log("User " + chalk.red(userID) + " has been Added to Event " + chalk.blue(eventID));
+        });
+    });
+}
+function creatNewWish(userID) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your "+chalk.blue("Events")+"\n");
             console.log(chalk.blue("--------------------------------------"));
@@ -124,56 +162,48 @@ function creatNewWish() {
 
             }
         });
-    });
-
 }
-function postWish(eventID,userID,name,location) {
-    //Build base Options
-    let options = {
-        method: 'POST',
-        uri :  DIENST_GEBER + '/events/' + eventID + '/wishes',
-        body :
-            {'name' : name,
-            'location': location,
-            'user': userID},
-        json: true, // Automatically stringifies the body to JSON
-        resolveWithFullResponse: true
-    };
-    rp(options);
-}
-function getEventsOfUser(userId) {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/users/' + userId + '/events',
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
 
-        rp(options)
-            .then(function (res) {
-                resolve(res);
+function createNewEventAndAddUsers() {
+    let usersNames = [];
+    let eventName;
+
+    //Dialog------------------------------------------
+    eventName = readlineSync.question('What is the Name of your new Event?\n');
+    console.log("Enter the Names of the People you want to add to the Event (Press ENTER again to Confirm)");
+
+    while (run = true) {
+        let newName =  readlineSync.question('name: ');
+
+        if(newName == ""){
+            break;
+        }else {
+            usersNames.push(newName);
+        }
+    }
+
+    //Logic-------------------------------------------
+    postUsers(usersNames).then(function (users) {  //Create new Useres for each name
+        postEvent(eventName).then(function (eventlocation) {  //Create Event with given name
+            postUsersToEvent(users,uriToID(eventlocation)).then(function () { //Add Users to Event
+
+                //Build Response Text
+                let responseMessage =
+                    "----------------------------------------------------\n" +
+                    "The Event: " + chalk.green(eventName) + " was created\n"+
+                    "Event URI: " + chalk.blue(eventlocation) +"\n"+
+                    "----------------------------------------------------\n" +
+                    "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
+
+                console.log(responseMessage);
             });
-    });
-}
-function getAllUsers() {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/users',
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
-
-        rp(options)
-            .then(function (res) {
-                resolve(res);
-            });
+        });
     });
 
+
 }
+
+//Helper Functions--------------------------------
 /**
  * Cuts a URI (URL) at its last "/" and returns the second half of the string
  * @param uri a URI as a String
@@ -249,11 +279,11 @@ function postEvent(eventName) {
  * @param eventlocation URI of Event
  * @returns {Promise<any>}
  */
-function postUsersToEvent(userURIs, eventlocation) {
+function postUsersToEvent(userURIs, eventID) {
 
     let options = {
         method: 'POST',
-        uri :  eventlocation + '/users',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/users',
         json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true
     };
@@ -274,3 +304,67 @@ function postUsersToEvent(userURIs, eventlocation) {
         resolve();
     });
 }
+function postWish(eventID,userID,name,location) {
+    //Build base Options
+    let options = {
+        method: 'POST',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/wishes',
+        body :
+            {'name' : name,
+                'location': location,
+                'user': userID},
+        json: true, // Automatically stringifies the body to JSON
+        resolveWithFullResponse: true
+    };
+    rp(options);
+}
+function getEventsOfUser(userId) {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/users/' + userId + '/events',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+function getAllEvents() {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/events' ,
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+function getAllUsers() {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/users',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+
+}
+
