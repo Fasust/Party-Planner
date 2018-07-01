@@ -36,9 +36,9 @@ router.post('/', function (req, res) {
     let eventID = getIdInCollection(ROUTE);
 
     //Adding Links to child domains
-    let wishUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/wishes";
-    let shoppingUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/shoppinglist";
-    let userUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID + "/users";
+    let wishUri = req.protocol + '://' + req.get('host') + req.originalUrl + eventID + "/wishes";
+    let shoppingUri = req.protocol + '://' + req.get('host') + req.originalUrl + eventID + "/shoppinglist";
+    let userUri = req.protocol + '://' + req.get('host') + req.originalUrl + eventID + "/users";
     event.navigation = {
         "users" : userUri,
         "shoppinglist" : shoppingUri,
