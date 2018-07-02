@@ -155,7 +155,7 @@ router.post('/:eid/wishes', function (req, res) {
     db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
 
     // Send the URI of new event
-    let uri = req.protocol + '://' + req.get('host') + req.originalUrl +"/" + wishID;
+    let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
     res.set('location',uri);
     res.json(wish);
 });

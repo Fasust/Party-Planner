@@ -26,7 +26,7 @@ router.post('/', function (req, res) {
     let id = getIdInCollection(ROUTE);
 
     //add subdomains to user
-    let userEventURI = req.protocol + '://' + req.get('host') + req.originalUrl +id + "/events";
+    let userEventURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + id + "/events";
     user.navigation = {
         "events" : userEventURI
     };
@@ -34,7 +34,7 @@ router.post('/', function (req, res) {
     db.collection(ROUTE).doc(id).set(user);
 
     //Send the URI of new User
-    let userURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+id;
+    let userURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/" +id;
 
     res.set('location',userURI);
     res.json(user);
