@@ -1,5 +1,5 @@
 /* WBA2 Gruppe Sebastian Faust, Arthur Tissen, Julian Schoemaker */
-
+//to push subtree to heroku: "subtree push --prefix Dienstgeber heroku master"
 /************************************************************************
  * Load modules
  ************************************************************************/
