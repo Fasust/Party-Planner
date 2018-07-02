@@ -5,9 +5,7 @@
  ************************************************************************/
 
 // Init Firestore
-const fs = require('fs');
 const admin = require("firebase-admin");
-
 const serviceAccount = require("./wba2ftsKey.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -24,7 +22,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Init Route
 const usersRouter = require('./routes/users');
