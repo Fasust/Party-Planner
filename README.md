@@ -10,4 +10,4 @@ Jeder der Vier soll
 einen Teil besorgen und es soll sichergestellt werden, dass möglichst wenig unterschiedlichen Läden angefahren werden müssen.
 
 
-**Die Dokumentation ist im Wiki zu finden**
+**Die Dokumentation ist im [Wiki des Repositories](https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/wiki) zu finden.**
