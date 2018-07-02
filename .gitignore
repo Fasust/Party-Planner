@@ -1,7 +1,0 @@
-$ cat .gitignore
-
-# ignore Firebase config JSON
-wba2ftsKey.json
-
-# ignore directory node_modules
-node_modules/
