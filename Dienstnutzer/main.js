@@ -8,7 +8,8 @@ const rp = require('request-promise');
 const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
-const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+//const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main
@@ -78,9 +79,31 @@ function logedIn(userID) {
             break;
         case 4:
             //Post shoppinglist
+            chooseOneEvent(userID).then(function (eventID) {
+
+                generateShoppingslist(eventID);
+
+                let responseMessage =
+                    chalk.blue("----------------------------------------------------\n") +
+                    "The Shoppingslists are created now\n " +
+                    chalk.blue("----------------------------------------------------\n");
+                console.log(responseMessage);
+
+                //Recursion
+                logedIn(userID);
+            });
             break;
         case 5:
             //Get My Shoppinglist for event
+            // gesamte Shoppinglist für ein Event durchlaufen
+            chooseOneEvent(userID).then(function (eventID) {
+
+                getMyShoppinglist(userID, eventID);
+
+                //Recursion
+                logedIn(userID);
+            });
+
             break;
     }
 }
@@ -177,6 +200,19 @@ function creatNewWish(userID) {
                 }
 
             }
+        });
+    });
+}
+function chooseOneEvent(userID) {
+    return new Promise(function (resolve) {
+        getEventsOfUser(userID).then(function (events) {
+            console.log("These are all your "+ chalk.blue("Events")+"\n");
+            console.log(chalk.blue("--------------------------------------"));
+            console.log(events);
+            console.log(chalk.blue("--------------------------------------"));
+            let eventID = readlineSync.question('where do you want to generate shoppinglist?\nEventId: ');
+
+            resolve(eventID);
         });
     });
 }
@@ -383,5 +419,27 @@ function getAllUsers() {
             });
     });
 
+}
+function generateShoppingslist(eventID) {
+    let options = {
+        method: 'POST',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+        json: true, // Automatically stringifies the body to JSON
+        resolveWithFullResponse: true
+    };
+    rp(options);
+}
+function getMyShoppinglist(userID, eventID) {
+    let options = {
+        method: 'GET',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+        json: true, // Automatically stringifies the body to JSON
+        resolveWithFullResponse: true
+    };
+
+    // alle shoppinglist einträge durchsuchen und die nehmen, wo user = userID ist
+
+
+    rp(options);
 }
 
