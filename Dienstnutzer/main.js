@@ -98,10 +98,26 @@ function logedIn(userID) {
             // gesamte Shoppinglist für ein Event durchlaufen
             chooseOneEvent(userID).then(function (eventID) {
 
-                getMyShoppinglist(userID, eventID);
+                getMyShoppinglist(userID, eventID).then(function (myShoppingList) {
+                    let listCounter = 0;
 
-                //Recursion
-                logedIn(userID);
+                    // getWish Befehl der aus dem array alle Wünsche mit Location ausgibt
+                    myShoppingList.forEach(function (wish) {
+                        getWish(uriToID(wish), eventID).then(function (wishJson) {
+                            console.log(wishJson);
+                            listCounter++;
+
+                            if(listCounter >= myShoppingList.length){
+                                //Recursion
+                                logedIn(userID);
+                            }
+                        });
+
+                    });
+
+                });
+
+
             });
 
             break;
@@ -210,7 +226,7 @@ function chooseOneEvent(userID) {
             console.log(chalk.blue("--------------------------------------"));
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
-            let eventID = readlineSync.question('where do you want to generate shoppinglist?\nEventId: ');
+            let eventID = readlineSync.question('Which event you want to select?\nEventId: ');
 
             resolve(eventID);
         });
@@ -420,6 +436,22 @@ function getAllUsers() {
     });
 
 }
+function getWish(wishID, eventID) {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/events/' + eventID + '/wishes/' + wishID,
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
 function generateShoppingslist(eventID) {
     let options = {
         method: 'POST',
@@ -430,16 +462,41 @@ function generateShoppingslist(eventID) {
     rp(options);
 }
 function getMyShoppinglist(userID, eventID) {
-    let options = {
-        method: 'GET',
-        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
-        json: true, // Automatically stringifies the body to JSON
-        resolveWithFullResponse: true
-    };
+    return new Promise(function (resolve) {
+        let options = {
+            method: 'GET',
+            uri: DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+            json: true, // Automatically stringifies the body to JSON
+            resolveWithFullResponse: false
+        };
 
-    // alle shoppinglist einträge durchsuchen und die nehmen, wo user = userID ist
+        // alle shoppinglist einträge durchsuchen und die nehmen, wo user = userID ist
 
 
-    rp(options);
+        rp(options).then(function (allShoppingItems) {
+
+            let myShoppingList = [];
+
+            let arrayCounter = 0;
+
+            for(let key in allShoppingItems){
+                let potentialUserId = uriToID(allShoppingItems[key].user);
+                arrayCounter++;
+
+                if(potentialUserId.localeCompare(userID)) {
+                    myShoppingList.push(allShoppingItems[key].wish);
+                }
+
+                if(arrayCounter >= Object.keys(allShoppingItems).length) {
+                    resolve(myShoppingList);
+                }
+
+            }
+
+            }
+        );
+    });
+
+
 }
 
