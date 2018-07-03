@@ -101,6 +101,12 @@ function logedIn(userID) {
                 getMyShoppinglist(userID, eventID).then(function (myShoppingList) {
                     let listCounter = 0;
 
+                    let responseMessage =
+                        chalk.yellow("----------------------------------------------------\n") +
+                        "Your shoppinglist: \n" +
+                        chalk.yellow("----------------------------------------------------\n");
+                    console.log(responseMessage);
+
                     // getWish Befehl der aus dem array alle Wünsche mit Location ausgibt
                     myShoppingList.forEach(function (wish) {
                         getWish(uriToID(wish), eventID).then(function (wishJson) {
@@ -116,6 +122,8 @@ function logedIn(userID) {
                     });
 
                 });
+
+
 
 
             });
