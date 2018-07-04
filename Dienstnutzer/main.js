@@ -15,7 +15,7 @@ const DIENST_GEBER = 'http://localhost:3000';
  * Main
  ************************************************************************/
 
-// Start Display in Terminal where you can Login or Register
+// ------------------- Start Display in Terminal where you can Login or Register
 console.log(
     chalk.magenta('-------------------------\n') +
     '- Welcome to the Worlds -\n' +
@@ -40,7 +40,7 @@ switch (select){
  * Functions
  ************************************************************************/
 
-// Dialoges the user can walk through in the partyplaner
+// ------------------- Dialoges the user can walk through in the partyplaner
 function logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are now logged in as " + chalk.red(userID));
@@ -230,6 +230,12 @@ function creatNewWish(userID) {
         });
     });
 }
+
+/**
+ * openes a dialog where the user can choose one his events
+ * @param userID of the user logged in
+ * @returns {Promise<any>} resolve: int eventID
+ */
 function chooseOneEvent(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
@@ -283,9 +289,9 @@ function createNewEventAndAddUsers() {
 
 }
 
-// Helper Functions and Ressource operations from the Dienstnutzer
+// ------------------- Helper Functions and Ressource operations from the Dienstnutzer
 /**
- * Cuts a URI (URL) at its last "/" and returns the second half of the string
+ * Cuts a URI (URL) at its last "/" and returns the following part of the string
  * @param uri a URI as a String
  * @returns {*|string} hopefully an ID
  */
@@ -293,6 +299,7 @@ function uriToID(uri) {
     let uriArray = uri.split('/');
     return uriArray[uriArray.length -1];
 }
+
 /**
  * Takes an Array of Names and Posts each on as a new User
  * @param userNames Array of names
@@ -328,6 +335,7 @@ function postUsers(userNames) {
         });
     });
 }
+
 /**
  * POST new Event with Given Name
  * @param eventName name of event to be Posted
@@ -353,11 +361,12 @@ function postEvent(eventName) {
         });
     });
 }
+
 /**
  * Adds multiple users to given Event
  * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
  * @param eventlocation URI of Event
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: JSON
  */
 function postUsersToEvent(userURIs, eventID) {
 
@@ -410,7 +419,7 @@ function postWish(eventID,userID,name,location) {
 /**
  * get entered events of the user
  * @param userId of the user that is logged in
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: JSON
  */
 function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
@@ -431,7 +440,7 @@ function getEventsOfUser(userId) {
 
 /**
  * get all events that are created
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: JSON
  */
 function getAllEvents() {
     return new Promise(function (resolve) {
@@ -452,7 +461,7 @@ function getAllEvents() {
 
 /**
  * get all users in the partyplaner
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: JSON
  */
 function getAllUsers() {
     return new Promise(function (resolve) {
@@ -476,7 +485,7 @@ function getAllUsers() {
  * get a wish of the logged in user in this event
  * @param wishID of the wish you are searching for
  * @param eventID of the wish
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: JSON
  */
 function getWish(wishID, eventID) {
     return new Promise(function (resolve) {
@@ -513,7 +522,7 @@ function generateShoppingslist(eventID) {
  * get the items of the shoppinglist that are matched to myself
  * @param userID of the user logged in
  * @param eventID of the event the user wants to get his items from
- * @returns {Promise<any>}
+ * @returns {Promise<any>} resolve: Array
  */
 function getMyShoppinglist(userID, eventID) {
     return new Promise(function (resolve) {
