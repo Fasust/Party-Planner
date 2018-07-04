@@ -51,7 +51,7 @@ setRoutes();
 
 app.get('/', function (req, res) {
     let welcome = {
-        "msg" : "Welcome our Projekt for WBA2 2018\nThis is our little Party-Planer.\nHope you have a good time.",
+        "msg" : "Welcome our project for WBA2 2018\nThis is our little Partyplaner.\nHope you have a good time.",
         "navigation" : {
             "events" : req.protocol + '://' + req.get('host') + req.originalUrl  + "events",
             "users" : req.protocol + '://' + req.get('host') + req.originalUrl  + "users"

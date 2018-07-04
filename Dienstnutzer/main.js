@@ -15,6 +15,7 @@ const DIENST_GEBER = 'http://localhost:3000';
  * Main
  ************************************************************************/
 
+// Start Display in Terminal where you can Login or Register
 console.log(
     chalk.magenta('-------------------------\n') +
     '- Welcome to the Worlds -\n' +
@@ -22,7 +23,7 @@ console.log(
     chalk.magenta('-------------------------'));
 
 let selectOptions = ['Login','Register'];
-let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
+let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
 switch (select){
     case 0:
@@ -40,18 +41,18 @@ switch (select){
 //Dialoges------------------------------------
 function logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
-    console.log("You are Now Loged in as "+chalk.red(userID));
+    console.log("You are now logged in as " + chalk.red(userID));
     console.log(chalk.magenta("--------------------------------------"));
 
-    let selectOptions = ['Create Event','Show your Events','Enter an Event','Add Wish','Finalize the Shopping List for an Event','Get Your Shopping List for an Event'];
-    let select = readlineSync.keyInSelect(selectOptions, 'What do you Want to do? ');
+    let selectOptions = ['Create event','Show your events','Enter an event','Add wish','Finalize the shoppinglist for an event','Get your shoppinglist for an event'];
+    let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
     switch (select){
         case 0:
             createNewEvent().then(function (location) {
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
-                    "The Event Was Created\n: "+
+                    "The event Was Created\n: "+
                     "You can find it here: "+ location + "\n"+
                     chalk.blue("----------------------------------------------------\n");
                 console.log(responseMessage);
@@ -85,7 +86,7 @@ function logedIn(userID) {
 
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
-                    "The Shoppingslists are created now\n " +
+                    "The shoppingslists are created now\n " +
                     chalk.blue("----------------------------------------------------\n");
                 console.log(responseMessage);
 
@@ -134,13 +135,13 @@ function logedIn(userID) {
 function login() {
     return new Promise(function (resolve) {
         //Dialog------------------------------------------
-        console.log("These ar all "+chalk.red("users")+"\n");
+        console.log("These ar all " + chalk.red("users") + "\n");
 
         getAllUsers().then(function (users) {
             console.log(chalk.red("--------------------------------------"));
             console.log(users);
             console.log(chalk.red("--------------------------------------"));
-            let userID = readlineSync.question('as which one do you want to act?\nUserId: ');
+            let userID = readlineSync.question('As which one do you want to act?\nUserId: ');
 
             resolve(userID);
         });
@@ -150,7 +151,7 @@ function login() {
 function register() {
     return new Promise(function (resolve) {
         let names = [];
-        let userName = readlineSync.question('What is your Name?\nName: ');
+        let userName = readlineSync.question('What is your name?\nName: ');
         names.push(userName);
         postUsers(names).then(function (json) {
             console.log(json);
@@ -160,7 +161,7 @@ function register() {
 }
 function createNewEvent() {
     return new Promise(function (resolve) {
-        let eventName = readlineSync.question('What is the Name of your new Event?\n');
+        let eventName = readlineSync.question('What is the name of your new event?\n');
         postEvent(eventName).then(function (location) {
 
             resolve(location);
@@ -171,15 +172,15 @@ function createNewEvent() {
 function enterEvent(userID) {
     return new Promise(function (resolve) {
         getAllEvents().then(function (events) {
-            console.log("These are all " + chalk.blue("Events") + "\n");
+            console.log("These are all " + chalk.blue("events") + "\n");
             console.log(chalk.blue("--------------------------------------"));
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
-            let eventID = readlineSync.question('which one do you want to join?\nEventId: ');
+            let eventID = readlineSync.question('Which one do you want to join?\nEventId: ');
             let users = [];
             users.push(userID);
             postUsersToEvent(users, eventID).then(function () {
-                console.log("User " + chalk.red(userID) + " has been Added to Event " + chalk.blue(eventID));
+                console.log("User " + chalk.red(userID) + " has been added to event " + chalk.blue(eventID));
                 resolve();
             });
         });
@@ -189,13 +190,13 @@ function enterEvent(userID) {
 function creatNewWish(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
-            console.log("These are all your "+chalk.blue("Events")+"\n");
+            console.log("These are all your " + chalk.blue("Events") + "\n");
             console.log(chalk.blue("--------------------------------------"));
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
-            let eventID = readlineSync.question('where do you want to add new Wishes?\nEventId: ');
+            let eventID = readlineSync.question('Where do you want to add new wishes?\nEventId: ');
 
-            console.log("Enter the Wishes you You Want to add to this Event (Press ENTER on empty input to Abort)");
+            console.log("Enter the wishes you want to add to this event (Press ENTER on empty input to abort)");
 
             let caseSwitch = "nameCase";
             let name;
@@ -230,7 +231,7 @@ function creatNewWish(userID) {
 function chooseOneEvent(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
-            console.log("These are all your "+ chalk.blue("Events")+"\n");
+            console.log("These are all your " + chalk.blue("events") + "\n");
             console.log(chalk.blue("--------------------------------------"));
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
@@ -246,8 +247,8 @@ function createNewEventAndAddUsers() {
     let eventName;
 
     //Dialog------------------------------------------
-    eventName = readlineSync.question('What is the Name of your new Event?\n');
-    console.log("Enter the Names of the People you want to add to the Event (Press ENTER again to Confirm)");
+    eventName = readlineSync.question('What is the name of your new event?\n');
+    console.log("Enter the names of the people you want to add to the event (Press ENTER again to confirm)");
 
     while (run = true) {
         let newName =  readlineSync.question('name: ');
@@ -267,10 +268,10 @@ function createNewEventAndAddUsers() {
                 //Build Response Text
                 let responseMessage =
                     "----------------------------------------------------\n" +
-                    "The Event: " + chalk.green(eventName) + " was created\n"+
+                    "The event: " + chalk.green(eventName) + " was created\n"+
                     "Event URI: " + chalk.blue(eventlocation) +"\n"+
                     "----------------------------------------------------\n" +
-                    "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and where added to the Event.";
+                    "The Users : " + chalk.magenta(JSON.stringify(users)) + "\n\nhave been created and were added to the event.";
 
                 console.log(responseMessage);
             });
