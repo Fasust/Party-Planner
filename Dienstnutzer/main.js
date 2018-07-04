@@ -25,6 +25,7 @@ console.log(
 let selectOptions = ['Login','Register'];
 let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
+// Switch-case for the option the user selected
 switch (select){
     case 0:
         login().then( id => logedIn(id));
@@ -38,7 +39,8 @@ switch (select){
 /************************************************************************
  * Functions
  ************************************************************************/
-//Dialoges------------------------------------
+
+// Dialoges the user can walk through in the partyplaner
 function logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are now logged in as " + chalk.red(userID));
@@ -281,7 +283,7 @@ function createNewEventAndAddUsers() {
 
 }
 
-//Helper Functions--------------------------------
+// Helper Functions
 /**
  * Cuts a URI (URL) at its last "/" and returns the second half of the string
  * @param uri a URI as a String
@@ -382,6 +384,14 @@ function postUsersToEvent(userURIs, eventID) {
         resolve();
     });
 }
+
+/**
+ * Adds an wish from the user logged in to an event
+ * @param eventID where the wish will be added
+ * @param userID of the user that is logged in
+ * @param name of the wish (e.g. water)
+ * @param location of the shop where you can buy this wish (e.g. market)
+ */
 function postWish(eventID,userID,name,location) {
     //Build base Options
     let options = {
@@ -396,6 +406,12 @@ function postWish(eventID,userID,name,location) {
     };
     rp(options);
 }
+
+/**
+ * get entered events of the user
+ * @param userId of the user that is logged in
+ * @returns {Promise<any>}
+ */
 function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
         let options = {
@@ -412,6 +428,11 @@ function getEventsOfUser(userId) {
             });
     });
 }
+
+/**
+ * get all events that are created
+ * @returns {Promise<any>}
+ */
 function getAllEvents() {
     return new Promise(function (resolve) {
         let options = {
@@ -428,6 +449,11 @@ function getAllEvents() {
             });
     });
 }
+
+/**
+ * get all users in the partyplaner
+ * @returns {Promise<any>}
+ */
 function getAllUsers() {
     return new Promise(function (resolve) {
         let options = {
@@ -445,6 +471,13 @@ function getAllUsers() {
     });
 
 }
+
+/**
+ * get a wish of the logged in user in this event
+ * @param wishID of the wish you are searching for
+ * @param eventID of the wish
+ * @returns {Promise<any>}
+ */
 function getWish(wishID, eventID) {
     return new Promise(function (resolve) {
         let options = {
@@ -461,6 +494,11 @@ function getWish(wishID, eventID) {
             });
     });
 }
+
+/**
+ * Post on the events /shoppinglist to create it with all wishes
+ * @param eventID of the shoppinglist
+ */
 function generateShoppingslist(eventID) {
     let options = {
         method: 'POST',
@@ -470,6 +508,13 @@ function generateShoppingslist(eventID) {
     };
     rp(options);
 }
+
+/**
+ * get the items of the shoppinglist that are matched to myself
+ * @param userID of the user logged in
+ * @param eventID of the event the user wants to get his items from
+ * @returns {Promise<any>}
+ */
 function getMyShoppinglist(userID, eventID) {
     return new Promise(function (resolve) {
         let options = {
@@ -479,31 +524,26 @@ function getMyShoppinglist(userID, eventID) {
             resolveWithFullResponse: false
         };
 
-        // alle shoppinglist einträge durchsuchen und die nehmen, wo user = userID ist
-
-
         rp(options).then(function (allShoppingItems) {
-
             let myShoppingList = [];
-
             let arrayCounter = 0;
 
             for(let key in allShoppingItems){
                 let potentialUserId = uriToID(allShoppingItems[key].user);
                 arrayCounter++;
 
+                // compare the userID of the user logged in to the user of the shoppinglist items
                 if(potentialUserId.localeCompare(userID)) {
                     myShoppingList.push(allShoppingItems[key].wish);
                 }
 
+                // only resolve if the whole shoppinglist went through
                 if(arrayCounter >= Object.keys(allShoppingItems).length) {
                     resolve(myShoppingList);
                 }
 
             }
-
-            }
-        );
+        });
     });
 
 
