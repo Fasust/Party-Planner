@@ -283,7 +283,7 @@ function createNewEventAndAddUsers() {
 
 }
 
-// Helper Functions
+// Helper Functions and Ressource operations from the Dienstnutzer
 /**
  * Cuts a URI (URL) at its last "/" and returns the second half of the string
  * @param uri a URI as a String
