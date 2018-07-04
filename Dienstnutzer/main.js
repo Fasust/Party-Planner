@@ -41,6 +41,10 @@ switch (select){
  ************************************************************************/
 
 // ------------------- Dialoges the user can walk through in the partyplaner
+/**
+ * show dialoge for the user that is logged in with possible interactions
+ * @param userID that is logged in
+ */
 function logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are now logged in as " + chalk.red(userID));
@@ -134,6 +138,11 @@ function logedIn(userID) {
             break;
     }
 }
+
+/**
+ * login a already registered user
+ * @returns {Promise<any>} resolve: userID
+ */
 function login() {
     return new Promise(function (resolve) {
         //Dialog------------------------------------------
@@ -150,6 +159,11 @@ function login() {
     });
 
 }
+
+/**
+ * register a new user into the partyplaner
+ * @returns {Promise<any>} resolve: user and name added
+ */
 function register() {
     return new Promise(function (resolve) {
         let names = [];
@@ -161,6 +175,11 @@ function register() {
         });
     });
 }
+
+/**
+ * create an new event
+ * @returns {Promise<any>} resolve: event created
+ */
 function createNewEvent() {
     return new Promise(function (resolve) {
         let eventName = readlineSync.question('What is the name of your new event?\n');
@@ -171,6 +190,12 @@ function createNewEvent() {
     });
 
 }
+
+/**
+ * user can enter an event
+ * @param userID of the user logged in
+ * @returns {Promise<any>} resolve: dialoge displayed
+ */
 function enterEvent(userID) {
     return new Promise(function (resolve) {
         getAllEvents().then(function (events) {
@@ -189,6 +214,12 @@ function enterEvent(userID) {
     });
 
 }
+
+/**
+ * create a new wish for a user in an event
+ * @param userID of the user logged in
+ * @returns {Promise<any>} resolve: dialoge displayed
+ */
 function creatNewWish(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
