@@ -10,6 +10,9 @@ const db = admin.firestore();
 const express = require("express");
 const router = express.Router(null);
 
+//Own
+const fsExtensions = require('../own_modules/firestoreExtensions');
+
 // Init Route
 const ROUTE = "events";
 const ROUTE_WISH = "wishes";
@@ -33,7 +36,7 @@ router.post('/', function (req, res) {
     // Getting return values
     let event = req.body; //JSON in Body
 
-    let eventID = getIdInCollection(ROUTE);
+    let eventID = fsExtensions.getIdInCollection(ROUTE);
 
     //Adding Links to child domains
     let wishUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+ eventID + "/wishes";
@@ -57,14 +60,14 @@ router.post('/', function (req, res) {
 
 //GET-------------------------------------------------------------------
 router.get('/', function (req, res) {
-    getCollectionAsJSON(ROUTE).then(result => res.json(result));
+    fsExtensions.getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
 
 router.get('/:eid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
 
-    getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
 //PUT-------------------------------------------------------------------
@@ -86,7 +89,7 @@ router.put('/:eid' ,function (req, res) {
     let newEvent = req.body;
 
     db.collection(ROUTE).doc(eventID).set(newEvent);
-    getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -109,7 +112,7 @@ router.get('/:eid/wishes', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
 
-    getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH).then(result => res.json(result));
+    fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH).then(result => res.json(result));
 
 });
 
@@ -119,7 +122,7 @@ router.get('/:eid/wishes/:wid', function (req, res) {
     let eventID = req.params.eid;
     let wishID = req.params.wid;
 
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
 
 //POST------------------------------------------------------------------
@@ -145,7 +148,7 @@ router.post('/:eid/wishes', function (req, res) {
     let wish = req.body; //JSON in Body
     let userID = wish.user;
     let eventID = req.params.eid;
-    let wishID = getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+    let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
 
     //Change User ID to URI
     let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
@@ -193,7 +196,7 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     newWish.user = userURI;
 
     db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -216,7 +219,7 @@ router.get('/:eid/users', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
 
-    getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER).then(result => res.json(result));
+    fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER).then(result => res.json(result));
 });
 
 //One User
@@ -225,7 +228,7 @@ router.get('/:eid/users/:uid', function (req, res) {
     let eventID = req.params.eid;
     let userID = req.params.uid;
 
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });
 
 //POST------------------------------------------------------------------
@@ -306,7 +309,7 @@ router.put('/:eid/users/:uid' ,function (req, res) {
     db.collection('events').doc(eventID).update({
         ['users.'+userID]: userUri
     });
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -317,7 +320,7 @@ router.delete('/:eid/users/:uid' ,function (req, res) {
 
     //Removing User from Event Document
     //This Thechnically not Restconform, but a neccecarity, due to firestores lack of complex querrys (See Documentation for more details)
-    getDokumentAsJSON(ROUTE, eventID).then(event =>{
+    fsExtensions.getDokumentAsJSON(ROUTE, eventID).then(event =>{
         delete event.users[userID];
         db.collection(ROUTE).doc(eventID).set(event);
     });
@@ -336,7 +339,7 @@ router.get('/:eid/shoppinglist', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
 
-    getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
+    fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
 });
 
 router.get('/:eid/shoppinglist/:sid', function (req, res) {
@@ -344,7 +347,7 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
     let eventID = req.params.eid;
     let itemID = req.params.sid;
 
-    getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, itemID).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, itemID).then(result => res.json(result));
 });
 
 //POST-------------------------------------------------------------------
@@ -355,7 +358,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
     let eventID = req.params.eid;
 
     // Error handler - start
-    checkIfDocInCollection(ROUTE,eventID).then(function (result) {
+    fsExtensions.checkIfDocInCollection(ROUTE,eventID).then(function (result) {
         if (result == false) {
             res.status(400).send('Event ID does not exist!');
             return;
@@ -437,83 +440,10 @@ router.post('/:eid/shoppinglist', function (req, res) {
                     previosLocation = currentLocation;
                 });
                 //Send Result
-                getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
+                fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
             });
     });
 });
 
 //Export as Module
 module.exports = router;
-
-/************************************************************************
- * Functions
- ************************************************************************/
-
-/**
- * Returns a unigue ID in a specific collection
- * @param collectionName name of the collection that a id is to be generated for
- * @returns int id unique ID
- */
-function getIdInCollection(collectionName) {
-    let ref = db.collection(collectionName).doc();
-    let id = ref.id;
-
-    return id;
-}
-/**
- * Returns a Promise that is to be resolved as a JSON and represents a specific collection (GET)
- * @param collectionName naem of the collecetion
- * @returns {Promise<any>} Promise that resolves as JSON
- */
-function getCollectionAsJSON(collectionName) {
-    return new Promise(function (resolve) {
-        let json = {};
-
-        let collection = db.collection(collectionName);
-        collection.get()
-            .then(snapshot => {
-                snapshot.forEach(doc => {
-
-                    json[doc.id] = doc.data();
-                });
-            }).then(function () {
-            resolve(json);
-        });
-    });
-}
-/**
- * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
- * @param collectionName name of the collection
- * @param docName name of the document
- * @returns {Promise<any>} Promise that resolves as JSON
- */
-function getDokumentAsJSON(collectionName,docName) {
-    return new Promise(function (resolve) {
-        let json = {};
-
-        let document = db.collection(collectionName).doc(docName);
-        document.get()
-            .then(doc => {
-                json = doc.data();
-
-            }).then(function () {
-            resolve(json);
-        });
-    });
-}
-/**
- * Returns a Promise that is to be resolved as a boolean that shows us if a ID exists in a collection
- * @param collectionName name of the collection
- * @param docName name of the document
- * @returns {Promise<any>} Promise that resolves as bool
- */
-function checkIfDocInCollection(collectionName, docName) {
-    return new Promise(function (resolve) {
-        // Test for the existence of certain keys within a DataSnapshot;
-        db.collection(collectionName).doc(docName).get()
-            .then(function(snapshot) {
-                let idExists = snapshot.exists;
-                resolve(idExists);
-            });
-    });
-}
