@@ -327,6 +327,148 @@ function uriToID(uri) {
 }
 
 /**
+ * get the items of the shoppinglist that are matched to myself
+ * @param userID of the user logged in
+ * @param eventID of the event the user wants to get his items from
+ * @returns {Promise<any>} resolve: Array
+ */
+function getUserShoppinglist(userID, eventID) {
+    return new Promise(function (resolve) {
+        let options = {
+            method: 'GET',
+            uri: DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+            json: true, // Automatically stringifies the body to JSON
+            resolveWithFullResponse: false
+        };
+
+        rp(options).then(function (allShoppingItems) {
+            let myShoppingList = [];
+            let arrayCounter = 0;
+
+            for(let key in allShoppingItems){
+                let potentialUserId = uriToID(allShoppingItems[key].user);
+                arrayCounter++;
+
+                // compare the userID of the user logged in to the user of the shoppinglist items
+                if(potentialUserId == userID) {
+                    myShoppingList.push(allShoppingItems[key].wish);
+                }
+
+                // only resolve if the whole shoppinglist went through
+                if(arrayCounter >= Object.keys(allShoppingItems).length) {
+                    resolve(myShoppingList);
+                }
+
+            }
+        });
+    });
+
+
+}
+
+/**
+ * get entered events of the user
+ * @param userId of the user that is logged in
+ * @returns {Promise<any>} resolve: JSON
+ */
+function getEventsOfUser(userId) {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/users/' + userId + '/events',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+
+/**
+ * get all events that are created
+ * @returns {Promise<any>} resolve: JSON
+ */
+function getAllEvents() {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/events' ,
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+
+/**
+ * get all users in the partyplaner
+ * @returns {Promise<any>} resolve: JSON
+ */
+function getAllUsers() {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/users',
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+
+}
+
+/**
+ * get a wish of the logged in user in this event
+ * @param wishID of the wish you are searching for
+ * @param eventID of the wish
+ * @returns {Promise<any>} resolve: JSON
+ */
+function getWish(wishID, eventID) {
+    return new Promise(function (resolve) {
+        let options = {
+            uri: DIENST_GEBER + '/events/' + eventID + '/wishes/' + wishID,
+            headers: {
+                'User-Agent': 'Request-Promise'
+            },
+            json: true // Automatically parses the JSON string in the response
+        };
+
+        rp(options)
+            .then(function (res) {
+                resolve(res);
+            });
+    });
+}
+
+/**
+ * Post on the events /shoppinglist to create it with all wishes
+ * @param eventID of the shoppinglist
+ */
+function postShoppingslist(eventID) {
+    let options = {
+        method: 'POST',
+        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+        json: true, // Automatically stringifies the body to JSON
+        resolveWithFullResponse: true
+    };
+    rp(options);
+}
+
+/**
  * Takes an Array of Names and Posts each on as a new User
  * @param userNames Array of names
  * @returns {Promise<any>} a Promis that is to be resoled with a JSON that links each name to there Location (URI) in the System
@@ -441,146 +583,3 @@ function postWish(eventID,userID,name,location) {
     };
     rp(options);
 }
-
-/**
- * get entered events of the user
- * @param userId of the user that is logged in
- * @returns {Promise<any>} resolve: JSON
- */
-function getEventsOfUser(userId) {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/users/' + userId + '/events',
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
-
-        rp(options)
-            .then(function (res) {
-                resolve(res);
-            });
-    });
-}
-
-/**
- * get all events that are created
- * @returns {Promise<any>} resolve: JSON
- */
-function getAllEvents() {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/events' ,
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
-
-        rp(options)
-            .then(function (res) {
-                resolve(res);
-            });
-    });
-}
-
-/**
- * get all users in the partyplaner
- * @returns {Promise<any>} resolve: JSON
- */
-function getAllUsers() {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/users',
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
-
-        rp(options)
-            .then(function (res) {
-                resolve(res);
-            });
-    });
-
-}
-
-/**
- * get a wish of the logged in user in this event
- * @param wishID of the wish you are searching for
- * @param eventID of the wish
- * @returns {Promise<any>} resolve: JSON
- */
-function getWish(wishID, eventID) {
-    return new Promise(function (resolve) {
-        let options = {
-            uri: DIENST_GEBER + '/events/' + eventID + '/wishes/' + wishID,
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
-        };
-
-        rp(options)
-            .then(function (res) {
-                resolve(res);
-            });
-    });
-}
-
-/**
- * Post on the events /shoppinglist to create it with all wishes
- * @param eventID of the shoppinglist
- */
-function postShoppingslist(eventID) {
-    let options = {
-        method: 'POST',
-        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
-        json: true, // Automatically stringifies the body to JSON
-        resolveWithFullResponse: true
-    };
-    rp(options);
-}
-
-/**
- * get the items of the shoppinglist that are matched to myself
- * @param userID of the user logged in
- * @param eventID of the event the user wants to get his items from
- * @returns {Promise<any>} resolve: Array
- */
-function getUserShoppinglist(userID, eventID) {
-    return new Promise(function (resolve) {
-        let options = {
-            method: 'GET',
-            uri: DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
-            json: true, // Automatically stringifies the body to JSON
-            resolveWithFullResponse: false
-        };
-
-        rp(options).then(function (allShoppingItems) {
-            let myShoppingList = [];
-            let arrayCounter = 0;
-
-            for(let key in allShoppingItems){
-                let potentialUserId = uriToID(allShoppingItems[key].user);
-                arrayCounter++;
-
-                // compare the userID of the user logged in to the user of the shoppinglist items
-                if(potentialUserId == userID) {
-                    myShoppingList.push(allShoppingItems[key].wish);
-                }
-
-                // only resolve if the whole shoppinglist went through
-                if(arrayCounter >= Object.keys(allShoppingItems).length) {
-                    resolve(myShoppingList);
-                }
-
-            }
-        });
-    });
-
-
-}
-
