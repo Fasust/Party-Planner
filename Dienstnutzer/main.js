@@ -102,7 +102,6 @@ function logedIn(userID) {
             break;
         case 5:
             //Get My Shoppinglist for event
-            // gesamte Shoppinglist für ein Event durchlaufen
             chooseOneEvent(userID).then(function (eventID) {
 
                 getMyShoppinglist(userID, eventID).then(function (myShoppingList) {
@@ -114,7 +113,6 @@ function logedIn(userID) {
                         chalk.yellow("----------------------------------------------------\n");
                     console.log(responseMessage);
 
-                    // getWish Befehl der aus dem array alle Wünsche mit Location ausgibt
                     myShoppingList.forEach(function (wish) {
                         getWish(uriToID(wish), eventID).then(function (wishJson) {
                             console.log(wishJson);
