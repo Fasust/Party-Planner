@@ -20,7 +20,9 @@ const ROUTE_USER = "users";
  * Events
  ************************************************************************/
 
-//POST-------------------------------------------------------------------
+/**
+ * Events POST: create an event
+ */
 router.post('/', function (req, res) {
 
     // Error handler - start
@@ -55,11 +57,16 @@ router.post('/', function (req, res) {
     res.json(event);
 });
 
-//GET-------------------------------------------------------------------
+/**
+ * Events GET: get all events
+ */
 router.get('/', function (req, res) {
     getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
 
+/**
+ * Events GET: get an event
+ */
 router.get('/:eid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -67,7 +74,9 @@ router.get('/:eid' ,function (req, res) {
     getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
-//PUT-------------------------------------------------------------------
+/**
+ * Events PUT: overwrite an event
+ */
 router.put('/:eid' ,function (req, res) {
 
     // Error handler - start
@@ -89,7 +98,9 @@ router.put('/:eid' ,function (req, res) {
     getDokumentAsJSON(ROUTE, eventID).then(result => res.json(result));
 });
 
-//DELETE----------------------------------------------------------------
+/**
+ * Events DELETE: delete an event
+ */
 router.delete('/:eid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -102,9 +113,9 @@ router.delete('/:eid' ,function (req, res) {
  * Wishes
  ************************************************************************/
 
-//GET-------------------------------------------------------------------
-
-// gebe alle Wuensche eines Events aus
+/**
+ * Wishes GET: get all wishes from event
+ */
 router.get('/:eid/wishes', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -113,7 +124,9 @@ router.get('/:eid/wishes', function (req, res) {
 
 });
 
-// gebe einen Wunschn für ein Event áus
+/**
+ * Wishes GET: get a wish from event
+ */
 router.get('/:eid/wishes/:wid', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -122,8 +135,9 @@ router.get('/:eid/wishes/:wid', function (req, res) {
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
 
-//POST------------------------------------------------------------------
-
+/**
+ * Wishes POST: post a wish for an event
+ */
 router.post('/:eid/wishes', function (req, res) {
 
     // Error handler - start
@@ -160,7 +174,9 @@ router.post('/:eid/wishes', function (req, res) {
     res.json(wish);
 });
 
-//PUT------------------------------------------------------------------
+/**
+ * Wishes PUT: overwrite a wish for an event
+ */
 router.put('/:eid/wishes/:wid' ,function (req, res) {
 
     // Error handler - start
@@ -196,7 +212,9 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
 });
 
-//DELETE----------------------------------------------------------------
+/**
+ * Wishes DELETE: delete a wish for an event
+ */
 router.delete('/:eid/wishes/:wid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -209,9 +227,10 @@ router.delete('/:eid/wishes/:wid' ,function (req, res) {
 /************************************************************************
  * Users
  ************************************************************************/
-//GET-------------------------------------------------------------------
 
-//all users of Event
+/**
+ * Users GET: get all users of an event
+ */
 router.get('/:eid/users', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -219,7 +238,9 @@ router.get('/:eid/users', function (req, res) {
     getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER).then(result => res.json(result));
 });
 
-//One User
+/**
+ * Users GET: get one user of an event
+ */
 router.get('/:eid/users/:uid', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -228,8 +249,9 @@ router.get('/:eid/users/:uid', function (req, res) {
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });
 
-//POST------------------------------------------------------------------
-
+/**
+ * Users POST: create a user of an event
+ */
 router.post('/:eid/users', function (req, res) {
 
     // Error handler - start
@@ -271,7 +293,9 @@ router.post('/:eid/users', function (req, res) {
     res.json(user);
 });
 
-//PUT------------------------------------------------------------------
+/**
+ * Users PUT: overwrite a user of an event
+ */
 router.put('/:eid/users/:uid' ,function (req, res) {
 
     // Error handler - start
@@ -309,7 +333,9 @@ router.put('/:eid/users/:uid' ,function (req, res) {
     getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_USER, userID).then(result => res.json(result));
 });
 
-//DELETE----------------------------------------------------------------
+/**
+ * Users DELETE: delete a user of an event
+ */
 router.delete('/:eid/users/:uid' ,function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -331,7 +357,9 @@ router.delete('/:eid/users/:uid' ,function (req, res) {
  * Soppinglist
  ************************************************************************/
 
-//GET-------------------------------------------------------------------
+/**
+ * Shoppinglist GET: get the shoppinglist of an event
+ */
 router.get('/:eid/shoppinglist', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
@@ -339,6 +367,9 @@ router.get('/:eid/shoppinglist', function (req, res) {
     getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
 });
 
+/**
+ * Shoppinglist GET: get one item of the shoppinglist of an event
+ */
 router.get('/:eid/shoppinglist/:sid', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;
