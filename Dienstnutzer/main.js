@@ -194,6 +194,7 @@ function dialog_createNewEvent() {
 
 /**
  * user can enter an event
+ * Note: with creating an event, the user is not automatically added to the event. He has to use this function.
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: dialoge displayed
  */
@@ -218,6 +219,7 @@ function dialog_enterEvent(userID) {
 
 /**
  * create a new wish for a user in an event
+ * used the helper function getEventsOfUser first to give the user the opinion to see all events the joined
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: dialoge displayed
  */
@@ -265,6 +267,7 @@ function dialog_creatNewWish(userID) {
 
 /**
  * openes a dialog where the user can choose one his events
+ * used the helper function getEventsOfUser first to give the user the opinion to see all events the joined
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: int eventID
  */

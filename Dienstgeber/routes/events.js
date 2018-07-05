@@ -228,11 +228,11 @@ router.delete('/:eid/wishes/:wid' ,function (req, res) {
 });
 
 /************************************************************************
- * Users
+ * Users (in an event)
  ************************************************************************/
 
 /**
- * Users GET: get all users of an event
+ * Users (in an event) GET: get all users of an event
  */
 router.get('/:eid/users', function (req, res) {
     // Getting return values
@@ -242,7 +242,7 @@ router.get('/:eid/users', function (req, res) {
 });
 
 /**
- * Users GET: get one user of an event
+ * Users (in an event) GET: get one user of an event
  */
 router.get('/:eid/users/:uid', function (req, res) {
     // Getting return values
@@ -253,7 +253,7 @@ router.get('/:eid/users/:uid', function (req, res) {
 });
 
 /**
- * Users POST: create a user of an event
+ * Users (in an event) POST: create a user of an event
  */
 router.post('/:eid/users', function (req, res) {
 
@@ -297,7 +297,7 @@ router.post('/:eid/users', function (req, res) {
 });
 
 /**
- * Users PUT: overwrite a user of an event
+ * Users (in an event) PUT: overwrite a user of an event
  */
 router.put('/:eid/users/:uid' ,function (req, res) {
 
@@ -337,7 +337,7 @@ router.put('/:eid/users/:uid' ,function (req, res) {
 });
 
 /**
- * Users DELETE: delete a user of an event
+ * Users (in an event) DELETE: delete a user of an event
  */
 router.delete('/:eid/users/:uid' ,function (req, res) {
     // Getting return values
@@ -381,9 +381,11 @@ router.get('/:eid/shoppinglist/:sid', function (req, res) {
     fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP, itemID).then(result => res.json(result));
 });
 
-//POST-------------------------------------------------------------------
-/* This Where The Matching Happens.
-When Posting on events/(id)/shoppinglist we automatically Match all wishes to the Users that are Part of the Event */
+/**
+ * This is where the matching happens
+ When posting on events/(id)/shoppinglist we automatically match all wishes to the users that are part of this event.
+ With this all users have the option to the their lists and know where to buy the items
+ */
 router.post('/:eid/shoppinglist', function (req, res) {
     // Getting return values
     let eventID = req.params.eid;

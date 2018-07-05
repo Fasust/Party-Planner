@@ -20,7 +20,9 @@ const ROUTE = "users";
  * Main
  ************************************************************************/
 
-//POST------------------------------------------------------------------
+/**
+ * Users POST: register a user into the Partyplaner application
+ */
 router.post('/', function (req, res) {
 
     let user = req.body; //JSON in Body
@@ -43,16 +45,24 @@ router.post('/', function (req, res) {
     res.json(user);
 });
 
-//GET-------------------------------------------------------------------
+/**
+ * Users GET: get all users of the Partyplaner application
+ */
 router.get('/', function (req, res) {
     fsExtensions.getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
+
+/**
+ * Users GET: get a user of the Partyplaner application
+ */
 router.get('/:uid' ,function (req, res) {
     let userId = req.params.uid;
     fsExtensions.getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
-//Get all events of a user
+/**
+ * Users GET: get all events of the user in the Partyplaner application
+ */
 router.get('/:uid/events' ,function (req, res) {
     let userId = req.params.uid;
 
@@ -68,7 +78,9 @@ router.get('/:uid/events' ,function (req, res) {
         });
 });
 
-//PUT-------------------------------------------------------------------
+/**
+ * Users PUT: overwrite a user of the Partyplaner application
+ */
 router.put('/:uid' ,function (req, res) {
     let userId = req.params.uid;
     let newUser = req.body;
@@ -77,7 +89,9 @@ router.put('/:uid' ,function (req, res) {
     fsExtensions.getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
-//DELETE----------------------------------------------------------------
+/**
+ * Users DELETE: delete a user of the Partyplaner application
+ */
 router.delete('/:uid' ,function (req, res) {
     let userId = req.params.uid;
     db.collection(ROUTE).doc(userId).delete();
@@ -93,7 +107,8 @@ module.exports = router;
  ************************************************************************/
 
 /**
- * Unused Methode that could tchnically be used to querry sub collections from firestore
+ * Unused Methode
+ * that could technically be used to querry sub collections from firestore
  * We do not use it becouse we deemed th workaround to "dirty".
  * We now use a different, more clean work around (See Wiki)
  * @param collectionName name of the Parent collection to querry from
