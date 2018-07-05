@@ -28,10 +28,10 @@ let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ')
 // Switch-case for the option the user selected
 switch (select){
     case 0:
-        login().then( id => logedIn(id));
+        dialog_login().then( id => dialog_logedIn(id));
         break;
     case 1:
-        register().then( id => logedIn(id));
+        dialog_register().then( id => dialog_logedIn(id));
         break;
 }
 
@@ -40,22 +40,22 @@ switch (select){
  * Functions
  ************************************************************************/
 
-// ------------------- Dialoges the user can walk through in the partyplaner
+//Dialoges the user can walk through in the partyplaner ------------------------------------------
 /**
  * show dialoge for the user that is logged in with possible interactions
  * @param userID that is logged in
  */
-function logedIn(userID) {
+function dialog_logedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are now logged in as " + chalk.red(userID));
     console.log(chalk.magenta("--------------------------------------"));
 
-    let selectOptions = ['Create event','Show your events','Enter an event','Add wish','Finalize the shoppinglist for an event','Get your shoppinglist for an event'];
+    let selectOptions = ['Create event [you are not automatically added to new event]','Show your events','Enter an event','Add wish','Finalize the shoppinglist for an event','Get your shoppinglist for an event'];
     let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
     switch (select){
         case 0:
-            createNewEvent().then(function (location) {
+            dialog_createNewEvent().then(function (location) {
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
                     "The event Was Created\n: "+
@@ -64,7 +64,7 @@ function logedIn(userID) {
                 console.log(responseMessage);
 
                 //Recursion
-                logedIn(userID);
+                dialog_logedIn(userID);
             });
             break;
         case 1:
@@ -75,20 +75,20 @@ function logedIn(userID) {
                 console.log(chalk.blue("-------------------"));
 
                 //Recursion
-                logedIn(userID);
+                dialog_logedIn(userID);
             });
             break;
         case 2:
-            enterEvent(userID).then(res => logedIn(userID));
+            dialog_enterEvent(userID).then(res => dialog_logedIn(userID));
             break;
         case 3:
-            creatNewWish(userID).then(res => logedIn(userID));
+            dialog_creatNewWish(userID).then(res => dialog_logedIn(userID));
             break;
         case 4:
             //Post shoppinglist
-            chooseOneEvent(userID).then(function (eventID) {
+            dialog_chooseOneEvent(userID).then(function (eventID) {
 
-                generateShoppingslist(eventID);
+                postShoppingslist(eventID);
 
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
@@ -97,14 +97,14 @@ function logedIn(userID) {
                 console.log(responseMessage);
 
                 //Recursion
-                logedIn(userID);
+                dialog_logedIn(userID);
             });
             break;
         case 5:
             //Get My Shoppinglist for event
-            chooseOneEvent(userID).then(function (eventID) {
+            dialog_chooseOneEvent(userID).then(function (eventID) {
 
-                getMyShoppinglist(userID, eventID).then(function (myShoppingList) {
+                getUserShoppinglist(userID, eventID).then(function (myShoppingList) {
                     let listCounter = 0;
 
                     let responseMessage =
@@ -120,16 +120,13 @@ function logedIn(userID) {
 
                             if(listCounter >= myShoppingList.length){
                                 //Recursion
-                                logedIn(userID);
+                                dialog_logedIn(userID);
                             }
                         });
 
                     });
 
                 });
-
-
-
 
             });
 
@@ -141,7 +138,7 @@ function logedIn(userID) {
  * login a already registered user
  * @returns {Promise<any>} resolve: userID
  */
-function login() {
+function dialog_login() {
     return new Promise(function (resolve) {
         //Dialog------------------------------------------
         console.log("These ar all " + chalk.red("users") + "\n");
@@ -162,7 +159,7 @@ function login() {
  * register a new user into the partyplaner
  * @returns {Promise<any>} resolve: user and name added
  */
-function register() {
+function dialog_register() {
     return new Promise(function (resolve) {
         let names = [];
         let userName = readlineSync.question('What is your name?\nName: ');
@@ -178,7 +175,7 @@ function register() {
  * create an new event
  * @returns {Promise<any>} resolve: event created
  */
-function createNewEvent() {
+function dialog_createNewEvent() {
     return new Promise(function (resolve) {
         let eventName = readlineSync.question('What is the name of your new event?\n');
         postEvent(eventName).then(function (location) {
@@ -194,7 +191,7 @@ function createNewEvent() {
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: dialoge displayed
  */
-function enterEvent(userID) {
+function dialog_enterEvent(userID) {
     return new Promise(function (resolve) {
         getAllEvents().then(function (events) {
             console.log("These are all " + chalk.blue("events") + "\n");
@@ -218,7 +215,7 @@ function enterEvent(userID) {
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: dialoge displayed
  */
-function creatNewWish(userID) {
+function dialog_creatNewWish(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your " + chalk.blue("Events") + "\n");
@@ -265,7 +262,7 @@ function creatNewWish(userID) {
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: int eventID
  */
-function chooseOneEvent(userID) {
+function dialog_chooseOneEvent(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your " + chalk.blue("events") + "\n");
@@ -318,7 +315,7 @@ function createNewEventAndAddUsers() {
 
 }
 
-// ------------------- Helper Functions and Ressource operations from the Dienstnutzer
+//Helper Functions and Ressource operations from the Dienstnutzer --------------------------------------
 /**
  * Cuts a URI (URL) at its last "/" and returns the following part of the string
  * @param uri a URI as a String
@@ -537,7 +534,7 @@ function getWish(wishID, eventID) {
  * Post on the events /shoppinglist to create it with all wishes
  * @param eventID of the shoppinglist
  */
-function generateShoppingslist(eventID) {
+function postShoppingslist(eventID) {
     let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
@@ -553,7 +550,7 @@ function generateShoppingslist(eventID) {
  * @param eventID of the event the user wants to get his items from
  * @returns {Promise<any>} resolve: Array
  */
-function getMyShoppinglist(userID, eventID) {
+function getUserShoppinglist(userID, eventID) {
     return new Promise(function (resolve) {
         let options = {
             method: 'GET',
@@ -571,7 +568,7 @@ function getMyShoppinglist(userID, eventID) {
                 arrayCounter++;
 
                 // compare the userID of the user logged in to the user of the shoppinglist items
-                if(potentialUserId.localeCompare(userID)) {
+                if(potentialUserId == userID) {
                     myShoppingList.push(allShoppingItems[key].wish);
                 }
 
