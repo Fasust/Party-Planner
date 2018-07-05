@@ -10,6 +10,9 @@ const db = admin.firestore();
 const express = require('express');
 const router = express.Router(null);
 
+//Own
+const fsExtensions = require('../own_modules/firestoreExtensions');
+
 // Init Route
 const ROUTE = "users";
 
@@ -23,7 +26,7 @@ router.post('/', function (req, res) {
     let user = req.body; //JSON in Body
 
     //POST them in Firebase
-    let id = getIdInCollection(ROUTE);
+    let id = fsExtensions.getIdInCollection(ROUTE);
 
     //add subdomains to user
     let userEventURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + id + "/events";
@@ -42,11 +45,11 @@ router.post('/', function (req, res) {
 
 //GET-------------------------------------------------------------------
 router.get('/', function (req, res) {
-    getCollectionAsJSON(ROUTE).then(result => res.json(result));
+    fsExtensions.getCollectionAsJSON(ROUTE).then(result => res.json(result));
 });
 router.get('/:uid' ,function (req, res) {
     let userId = req.params.uid;
-    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
 //Get all events of a user
@@ -71,7 +74,7 @@ router.put('/:uid' ,function (req, res) {
     let newUser = req.body;
 
     db.collection(ROUTE).doc(userId).set(newUser);
-    getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
+    fsExtensions.getDokumentAsJSON(ROUTE,userId).then(result => res.json(result));
 });
 
 //DELETE----------------------------------------------------------------
@@ -88,59 +91,6 @@ module.exports = router;
 /************************************************************************
  * Functions
  ************************************************************************/
-
-/**
- * Returns a unigue ID in a specific collection
- * @param collectionName name of the collection that a id is to be generated for
- * @returns int id unique ID
- */
-function getIdInCollection(collectionName) {
-    let ref = db.collection(collectionName).doc();
-    let id = ref.id;
-
-    return id;
-}
-/**
- * Returns a Promise that is to be resolved as a JSON and represents a specific collection (GET)
- * @param collectionName naem of the collecetion
- * @returns {Promise<any>} Promise that resolves as JSON
- */
-function getCollectionAsJSON(collectionName) {
-    return new Promise(function (resolve) {
-        let json = {};
-
-        let collection = db.collection(collectionName);
-        collection.get()
-            .then(snapshot => {
-                snapshot.forEach(doc => {
-
-                    json[doc.id] = doc.data();
-                });
-            }).then(function () {
-                resolve(json);
-            });
-    });
-}
-/**
- * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
- * @param collectionName name of the collection
- * @param docName name of the documeten
- * @returns {Promise<any>} Promise that resolves as JSON
- */
-function getDokumentAsJSON(collectionName,docName) {
-    return new Promise(function (resolve) {
-        let json = {};
-
-        let document = db.collection(collectionName).doc(docName);
-        document.get()
-            .then(doc => {
-                json = doc.data();
-
-            }).then(function () {
-                resolve(json);
-            });
-    });
-}
 
 /**
  * Unused Methode that could tchnically be used to querry sub collections from firestore
