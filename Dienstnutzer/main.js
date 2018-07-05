@@ -28,10 +28,10 @@ let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ')
 // Switch-case for the option the user selected
 switch (select){
     case 0:
-        dialog_login().then( id => dialog_logedIn(id));
+        dialog_login().then( id => dialog_loggedIn(id));
         break;
     case 1:
-        dialog_register().then( id => dialog_logedIn(id));
+        dialog_register().then( id => dialog_loggedIn(id));
         break;
 }
 
@@ -48,7 +48,7 @@ switch (select){
  * after using another function
  * @param userID that is logged in
  */
-function dialog_logedIn(userID) {
+function dialog_loggedIn(userID) {
     console.log(chalk.magenta("--------------------------------------"));
     console.log("You are now logged in as " + chalk.red(userID));
     console.log(chalk.magenta("--------------------------------------"));
@@ -67,7 +67,7 @@ function dialog_logedIn(userID) {
                 console.log(responseMessage);
 
                 //Recursion
-                dialog_logedIn(userID);
+                dialog_loggedIn(userID);
             });
             break;
         case 1:
@@ -78,20 +78,20 @@ function dialog_logedIn(userID) {
                 console.log(chalk.blue("-------------------"));
 
                 //Recursion
-                dialog_logedIn(userID);
+                dialog_loggedIn(userID);
             });
             break;
         case 2:
-            dialog_enterEvent(userID).then(res => dialog_logedIn(userID));
+            dialog_enterEvent(userID).then(res => dialog_loggedIn(userID));
             break;
         case 3:
-            dialog_creatNewWish(userID).then(res => dialog_logedIn(userID));
+            dialog_createNewWish(userID).then(res => dialog_loggedIn(userID));
             break;
         case 4:
             //Post shoppinglist
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
-                postShoppingslist(eventID);
+                postShoppinglist(eventID);
 
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
@@ -100,7 +100,7 @@ function dialog_logedIn(userID) {
                 console.log(responseMessage);
 
                 //Recursion
-                dialog_logedIn(userID);
+                dialog_loggedIn(userID);
             });
             break;
         case 5:
@@ -123,7 +123,7 @@ function dialog_logedIn(userID) {
 
                             if(listCounter >= myShoppingList.length){
                                 //Recursion
-                                dialog_logedIn(userID);
+                                dialog_loggedIn(userID);
                             }
                         });
 
@@ -223,7 +223,7 @@ function dialog_enterEvent(userID) {
  * @param userID of the user logged in
  * @returns {Promise<any>} resolve: dialoge displayed
  */
-function dialog_creatNewWish(userID) {
+function dialog_createNewWish(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your " + chalk.blue("Events") + "\n");
@@ -473,7 +473,7 @@ function getWish(wishID, eventID) {
  * Post on the events /shoppinglist to create it with all wishes
  * @param eventID of the shoppinglist
  */
-function postShoppingslist(eventID) {
+function postShoppinglist(eventID) {
     let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
