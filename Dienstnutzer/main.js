@@ -279,6 +279,11 @@ function chooseOneEvent(userID) {
     });
 }
 
+/**
+ * Unused function in our use case
+ * but smart function to create an event and also add users
+ * within 'one action'
+ */
 function createNewEventAndAddUsers() {
     let usersNames = [];
     let eventName;
