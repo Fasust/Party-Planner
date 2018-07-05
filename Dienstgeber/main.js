@@ -49,6 +49,9 @@ console.log("Faye server listening on port 8000");
 initExpress();
 setRoutes();
 
+/**
+ * get function for start page that gives navigation to events and users
+ */
 app.get('/', function (req, res) {
     let welcome = {
         "msg" : "Welcome our project for WBA2 2018\nThis is our little Partyplaner.\nHope you have a good time.",
@@ -64,8 +67,9 @@ app.get('/', function (req, res) {
 /************************************************************************
  * Functions
  ************************************************************************/
+
 /**
- * Initialize Express: Listen on Port, Init Log, init Error Handling
+ * Initialize Express: Listen on port, init Log, init error handling
  */
 function initExpress() {
 
@@ -85,8 +89,9 @@ function initExpress() {
         next();
     });
 }
+
 /**
- * Set Express Routes Users and Events
+ * Set Express routes Users and Events
  */
 function setRoutes() {
     app.use('/users',usersRouter);
