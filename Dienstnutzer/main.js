@@ -95,7 +95,7 @@ function dialog_loggedIn(userID) {
 
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
-                    "The shoppingslists are created now\n " +
+                    "The shoppinglists are created now\n " +
                     chalk.blue("----------------------------------------------------\n");
                 console.log(responseMessage);
 
@@ -145,7 +145,7 @@ function dialog_loggedIn(userID) {
 function dialog_login() {
     return new Promise(function (resolve) {
         //Dialog------------------------------------------
-        console.log("These ar all " + chalk.red("users") + "\n");
+        console.log("These are all " + chalk.red("users") + "\n");
 
         getAllUsers().then(function (users) {
             console.log(chalk.red("--------------------------------------"));
