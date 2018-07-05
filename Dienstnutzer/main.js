@@ -15,7 +15,7 @@ const DIENST_GEBER = 'http://localhost:3000';
  * Main
  ************************************************************************/
 
-// ------------------- Start Display in Terminal where you can Login or Register
+// --------------------------------------------- Start Display in Terminal where you can Login or Register
 console.log(
     chalk.magenta('-------------------------\n') +
     '- Welcome to the Worlds -\n' +
@@ -40,9 +40,12 @@ switch (select){
  * Functions
  ************************************************************************/
 
-//Dialoges the user can walk through in the partyplaner ------------------------------------------
+// --------------------------------------------- Dialoges the user can walk through in the partyplaner
+
 /**
  * show dialoge for the user that is logged in with possible interactions
+ * this function is used to build a recursive dialoge for the logged in user
+ * after using another function
  * @param userID that is logged in
  */
 function dialog_logedIn(userID) {
@@ -136,6 +139,7 @@ function dialog_logedIn(userID) {
 
 /**
  * login a already registered user
+ * this function is used for the users.js in the Dienstgeber
  * @returns {Promise<any>} resolve: userID
  */
 function dialog_login() {
@@ -157,6 +161,7 @@ function dialog_login() {
 
 /**
  * register a new user into the partyplaner
+ * this function is used for the users.js in the Dienstgeber
  * @returns {Promise<any>} resolve: user and name added
  */
 function dialog_register() {
@@ -173,6 +178,7 @@ function dialog_register() {
 
 /**
  * create an new event
+ * Note: the user, you are logged in with, is not automatically added to the event your created
  * @returns {Promise<any>} resolve: event created
  */
 function dialog_createNewEvent() {
@@ -320,7 +326,8 @@ function createNewEventAndAddUsers() {
 
 }
 
-//Helper Functions and Ressource operations from the Dienstnutzer --------------------------------------
+// --------------------------------------------- Helper Functions and Ressource operations from the Dienstnutzer
+
 /**
  * Cuts a URI (URL) at its last "/" and returns the following part of the string
  * @param uri a URI as a String
