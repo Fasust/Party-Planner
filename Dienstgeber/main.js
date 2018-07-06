@@ -1,7 +1,9 @@
 /* WBA2 Gruppe Sebastian Faust, Arthur Tissen, Julian Schoemaker */
+
 //to push subtree to heroku: "git subtree push --prefix Dienstgeber heroku master"
+
 /************************************************************************
- * Load modules
+ * Init modules
  ************************************************************************/
 
 // Init Firestore

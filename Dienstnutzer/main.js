@@ -1,14 +1,15 @@
 /* WBA2 Gruppe Sebastian Faust, Arthur Tissen, Julian Schoemaker */
 
 /************************************************************************
- * Load modules
+ * Init modules
  ************************************************************************/
 
 const rp = require('request-promise');
 const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
-//const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+// switch of Dienstgeber path with option localhost or heroku
+// const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
 const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
@@ -45,7 +46,7 @@ switch (select){
 /**
  * show dialoge for the user that is logged in with possible interactions
  * this function is used to build a recursive dialoge for the logged in user
- * after using another function
+ * after using another function in the application
  * @param userID that is logged in
  */
 function dialog_loggedIn(userID) {
@@ -95,7 +96,7 @@ function dialog_loggedIn(userID) {
 
                 let responseMessage =
                     chalk.blue("----------------------------------------------------\n") +
-                    "The shoppingslists are created now\n " +
+                    "The shoppinglists are created now\n " +
                     chalk.blue("----------------------------------------------------\n");
                 console.log(responseMessage);
 
@@ -145,7 +146,7 @@ function dialog_loggedIn(userID) {
 function dialog_login() {
     return new Promise(function (resolve) {
         //Dialog------------------------------------------
-        console.log("These ar all " + chalk.red("users") + "\n");
+        console.log("These are all " + chalk.red("users") + "\n");
 
         getAllUsers().then(function (users) {
             console.log(chalk.red("--------------------------------------"));
@@ -333,6 +334,7 @@ function createNewEventAndAddUsers() {
 
 /**
  * Cuts a URI (URL) at its last "/" and returns the following part of the string
+ * with this we can compare IDs in our processes
  * @param uri a URI as a String
  * @returns {*|string} hopefully an ID
  */
@@ -343,6 +345,7 @@ function uriToID(uri) {
 
 /**
  * get the items of the shoppinglist that are matched to myself
+ * we need this function, because the event just got one shoppinglist and the user 'extract' their list from it
  * @param userID of the user logged in
  * @param eventID of the event the user wants to get his items from
  * @returns {Promise<any>} resolve: Array
@@ -383,6 +386,7 @@ function getUserShoppinglist(userID, eventID) {
 
 /**
  * get entered events of the user
+ * we need this function for the dialoges where we first need the event the user wants to select
  * @param userId of the user that is logged in
  * @returns {Promise<any>} resolve: JSON
  */
@@ -484,9 +488,9 @@ function postShoppinglist(eventID) {
 }
 
 /**
- * Takes an Array of Names and Posts each on as a new User
+ * Takes an array of names and posts each one as a new user
  * @param userNames Array of names
- * @returns {Promise<any>} a Promis that is to be resoled with a JSON that links each name to there Location (URI) in the System
+ * @returns {Promise<any>} a Promise that is to be resoled with a JSON that links each name to there location (URI)
  */
 function postUsers(userNames) {
     let users = {};
@@ -520,9 +524,9 @@ function postUsers(userNames) {
 }
 
 /**
- * POST new Event with Given Name
+ * POST new gvent with given Name
  * @param eventName name of event to be Posted
- * @returns {Promise<any>} A promise that is to be resolved with a String that contains the Location (URI) of the new Event
+ * @returns {Promise<any>} A Promise that is to be resolved with a String that contains the location (URI) of the new event
  */
 function postEvent(eventName) {
     let eventLocation;
@@ -546,7 +550,7 @@ function postEvent(eventName) {
 }
 
 /**
- * Adds multiple users to given Event
+ * Adds multiple users to given event
  * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
  * @param eventlocation URI of Event
  * @returns {Promise<any>} resolve: JSON
@@ -578,7 +582,7 @@ function postUsersToEvent(userURIs, eventID) {
 }
 
 /**
- * Adds an wish from the user logged in to an event
+ * Adds an wish from the user logged in to an event with name and location where to buy
  * @param eventID where the wish will be added
  * @param userID of the user that is logged in
  * @param name of the wish (e.g. water)
