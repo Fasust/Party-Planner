@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker.git"
+    "url": "git+https://github.com/Fasust/WBA2SS18FaustTissenSchoemaker.git"
   },
   "author": "Sebastian Faust, Arthur Tissen, Julian Schoemaker",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/issues"
+    "url": "https://github.com/Fasust/WBA2SS18FaustTissenSchoemaker/issues"
   },
-  "homepage": "https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker#readme",
+  "homepage": "https://github.com/Fasust/WBA2SS18FaustTissenSchoemaker#readme",
   "dependencies": {
     "body-parser": "1.18.3",
     "chalk": "2.3.2",
