@@ -42,6 +42,7 @@ router.post('/', function (req, res) {
     let userURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/" +id;
 
     res.set('location',userURI);
+    res.status(201);
     res.json(user);
 });
 
