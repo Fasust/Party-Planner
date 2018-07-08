@@ -21,7 +21,7 @@ exports.getIdInCollection = function(collectionName) {
 /**
  * Returns a Promise that is to be resolved as a JSON and represents a specific collection (GET)
  * @param collectionName naem of the collecetion
- * @returns {Promise<any>} Promise that resolves as JSON
+ * @returns {Promise<JSON>} Promise that resolves as JSON
  */
 exports.getCollectionAsJSON =  function(collectionName) {
     return new Promise(function (resolve) {
@@ -43,7 +43,7 @@ exports.getCollectionAsJSON =  function(collectionName) {
  * Returns a Promise that is to be resolved as a JSON and represents a specific document in a collection (GET)
  * @param collectionName name of the collection
  * @param docName name of the documeten
- * @returns {Promise<any>} Promise that resolves as JSON
+ * @returns {Promise<JSON>} Promise that resolves as JSON
  */
 exports.getDokumentAsJSON = function(collectionName,docName) {
     return new Promise(function (resolve) {
@@ -63,7 +63,7 @@ exports.getDokumentAsJSON = function(collectionName,docName) {
  * Returns a Promise that is to be resolved as a boolean that shows us if a ID exists in a collection
  * @param collectionName name of the collection
  * @param docName name of the document
- * @returns {Promise<any>} Promise that resolves as bool
+ * @returns {Promise<boolean>} Promise that resolves as bool
  */
 exports.checkIfDocInCollection = function(collectionName, docName) {
     return new Promise(function (resolve) {
