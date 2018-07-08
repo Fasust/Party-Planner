@@ -96,12 +96,6 @@ router.put('/:eid' ,function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    fsExtensions.checkIfDocInCollection(ROUTE,req.params.eid).then(function (result) {
-        if(result == false){
-            res.status(404).send('No Event with this ID');
-            return;
-        }
-    });
     // Error handler - end
 
     // Getting return values
