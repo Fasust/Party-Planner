@@ -86,7 +86,10 @@ function dialog_loggedIn(userID) {
             dialog_enterEvent(userID).then(res => dialog_loggedIn(userID));
             break;
         case 3:
-            dialog_createNewWish(userID).then(res => dialog_loggedIn(userID));
+            dialog_createNewWish(userID).then(function(){
+                console.log("------------------------");
+                dialog_loggedIn(userID);
+            });
             break;
         case 4:
             //Post shoppinglist
@@ -245,6 +248,7 @@ function dialog_createNewWish(userID) {
                     case "nameCase":
                         name =  readlineSync.question('name: ');
                         if(name == ""){
+                            resolve();
                             return;
                         }
                         caseSwitch = "locCase";
@@ -253,6 +257,7 @@ function dialog_createNewWish(userID) {
                         location =  readlineSync.question('location: ');
                         if(location == ""){
                             resolve();
+                            return;
                         }
 
                         postWish(eventID,userID,name,location);
