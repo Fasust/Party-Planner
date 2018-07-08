@@ -75,3 +75,35 @@ exports.checkIfDocInCollection = function(collectionName, docName) {
             });
     });
 };
+
+/**
+ * Unused Methode
+ * that could technically be used to querry sub collections from firestore
+ * We do not use it becouse we deemed th workaround to "dirty".
+ * We now use a different, more clean work around (See Wiki)
+ * @param collectionName name of the Parent collection to querry from
+ * @param subcollectionName name of the child collection to querry from
+ * @param nameOfIDAtributeInDoc name of the atribut in the documents of the child collection that conatins the id to querry by
+ * @param idToQuerryFor
+ * @returns {Promise<any>} returns a promise that is to be resolves as an array off all ids that fit the querry request
+ */
+function querryInSubcollection(collectionName, subcollectionName, nameOfIDAtributeInDoc, idToQuerryFor) {
+    return new Promise(function (resolve) {
+        let resultList = [];
+
+        //Get Documents in Parent Collection
+        db.collection(collectionName).get().then(parentSnap => {
+            parentSnap.forEach(document => {
+
+                //Retrive sub collection of each document
+                db.collection(collectionName).doc(document.id).collection(subcollectionName).
+                where(nameOfIDAtributeInDoc, '==', idToQuerryFor).get().  //Where the nameOfIDAtributeInDoc is equal to the idToQuerryFor
+                then(subDocument => {
+                    resultList.push(document.id);
+                    console.log(document.id);
+                });
+            });
+        });
+        setTimeout(resolve, 5000,resultList);
+    });
+}
