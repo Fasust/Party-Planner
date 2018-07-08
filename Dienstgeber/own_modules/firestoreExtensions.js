@@ -76,6 +76,10 @@ exports.checkIfDocInCollection = function(collectionName, docName) {
     });
 };
 
+/************************************************************************
+ * Deprecated
+ ************************************************************************/
+
 /**
  * Unused Methode
  * that could technically be used to querry sub collections from firestore
