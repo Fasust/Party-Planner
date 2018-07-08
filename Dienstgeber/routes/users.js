@@ -32,7 +32,7 @@ router.post('/', function (req, res) {
 
     //add subdomains to user
     let userEventURI = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + id + "/events";
-    user.navigation = {
+    user.links = {
         "events" : userEventURI
     };
 
