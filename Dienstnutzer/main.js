@@ -9,8 +9,8 @@ const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
 // switch of Dienstgeber path with option localhost or heroku
-// const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
-const DIENST_GEBER = 'http://localhost:3000';
+const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+//const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main

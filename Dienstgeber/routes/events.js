@@ -401,11 +401,6 @@ router.post('/:eid/shoppinglist', function (req, res) {
             return;
         }
     });
-
-    if(req.params.eid == null ) {
-        res.status(400).send('No valid Event ID!');
-        return;
-    }
     // Error handler - end
 
 
@@ -446,7 +441,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                 wishes.forEach(wish => {
                     currentLocation = wish.data().location;
                     if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                        if(index >= Object.keys(userIDs).length-1) {
+                        if(index > Object.keys(userIDs).length) {
                             console.log("\n> New Iteration");
                             index = 0;
                         }else{
@@ -466,13 +461,6 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         "wish" :  wishURI,
                         "user" : userURI
                     };
-                    /* To show more detail in the POST (is redundant)
-                    entry.wish = {
-                        "uri": wishURI,
-                        "location": wish.data().location,
-                        "name": wish.data().name
-                    };
-                    */
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
