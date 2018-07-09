@@ -401,21 +401,13 @@ router.post('/:eid/shoppinglist', function (req, res) {
             return;
         }
     });
-
-    if(req.params.eid == null ) {
-        res.status(400).send('No valid Event ID!');
-        return;
-    }
     // Error handler - end
-
 
     //GET all WISHES in EVENT
     let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
     let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
-
-
 
     //Save all User Ids in an Array and Return it
     let userIDs = {};
@@ -466,13 +458,6 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         "wish" :  wishURI,
                         "user" : userURI
                     };
-                    /* To show more detail in the POST (is redundant)
-                    entry.wish = {
-                        "uri": wishURI,
-                        "location": wish.data().location,
-                        "name": wish.data().name
-                    };
-                    */
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
