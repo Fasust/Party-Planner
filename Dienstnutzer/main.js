@@ -9,8 +9,8 @@ const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
 // switch of Dienstgeber path with option localhost or heroku
-// const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
-const DIENST_GEBER = 'http://localhost:3000';
+const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+//const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main
@@ -86,7 +86,10 @@ function dialog_loggedIn(userID) {
             dialog_enterEvent(userID).then(res => dialog_loggedIn(userID));
             break;
         case 3:
-            dialog_createNewWish(userID).then(res => dialog_loggedIn(userID));
+            dialog_createNewWish(userID).then(function(){
+                console.log("------------------------");
+                dialog_loggedIn(userID);
+            });
             break;
         case 4:
             //Post shoppinglist
@@ -141,7 +144,7 @@ function dialog_loggedIn(userID) {
 /**
  * login a already registered user
  * this function is used for the users.js in the Dienstgeber
- * @returns {Promise<any>} resolve: userID
+ * @returns {Promise<int>} resolve: userID
  */
 function dialog_login() {
     return new Promise(function (resolve) {
@@ -163,7 +166,7 @@ function dialog_login() {
 /**
  * register a new user into the partyplaner
  * this function is used for the users.js in the Dienstgeber
- * @returns {Promise<any>} resolve: user and name added
+ * @returns {Promise<int>} resolve: userID
  */
 function dialog_register() {
     return new Promise(function (resolve) {
@@ -180,7 +183,7 @@ function dialog_register() {
 /**
  * create an new event
  * Note: the user, you are logged in with, is not automatically added to the event your created
- * @returns {Promise<any>} resolve: event created
+ * @returns {Promise<String>} resolve: event created as URI
  */
 function dialog_createNewEvent() {
     return new Promise(function (resolve) {
@@ -197,7 +200,7 @@ function dialog_createNewEvent() {
  * user can enter an event
  * Note: with creating an event, the user is not automatically added to the event. He has to use this function.
  * @param userID of the user logged in
- * @returns {Promise<any>} resolve: dialoge displayed
+ * @returns {Promise<>} null
  */
 function dialog_enterEvent(userID) {
     return new Promise(function (resolve) {
@@ -222,7 +225,7 @@ function dialog_enterEvent(userID) {
  * create a new wish for a user in an event
  * used the helper function getEventsOfUser first to give the user the opinion to see all events the joined
  * @param userID of the user logged in
- * @returns {Promise<any>} resolve: dialoge displayed
+ * @returns {Promise<>} null
  */
 function dialog_createNewWish(userID) {
     return new Promise(function (resolve) {
@@ -245,6 +248,7 @@ function dialog_createNewWish(userID) {
                     case "nameCase":
                         name =  readlineSync.question('name: ');
                         if(name == ""){
+                            resolve();
                             return;
                         }
                         caseSwitch = "locCase";
@@ -253,6 +257,7 @@ function dialog_createNewWish(userID) {
                         location =  readlineSync.question('location: ');
                         if(location == ""){
                             resolve();
+                            return;
                         }
 
                         postWish(eventID,userID,name,location);
@@ -270,7 +275,7 @@ function dialog_createNewWish(userID) {
  * openes a dialog where the user can choose one his events
  * used the helper function getEventsOfUser first to give the user the opinion to see all events the joined
  * @param userID of the user logged in
- * @returns {Promise<any>} resolve: int eventID
+ * @returns {Promise<int>} resolve: int eventID
  */
 function dialog_chooseOneEvent(userID) {
     return new Promise(function (resolve) {
@@ -348,7 +353,7 @@ function uriToID(uri) {
  * we need this function, because the event just got one shoppinglist and the user 'extract' their list from it
  * @param userID of the user logged in
  * @param eventID of the event the user wants to get his items from
- * @returns {Promise<any>} resolve: Array
+ * @returns {Promise<Array>} resolve: Array
  */
 function getUserShoppinglist(userID, eventID) {
     return new Promise(function (resolve) {
@@ -388,7 +393,7 @@ function getUserShoppinglist(userID, eventID) {
  * get entered events of the user
  * we need this function for the dialoges where we first need the event the user wants to select
  * @param userId of the user that is logged in
- * @returns {Promise<any>} resolve: JSON
+ * @returns {Promise<JSON>} events
  */
 function getEventsOfUser(userId) {
     return new Promise(function (resolve) {
@@ -409,7 +414,7 @@ function getEventsOfUser(userId) {
 
 /**
  * get all events that are created
- * @returns {Promise<any>} resolve: JSON
+ * @returns {Promise<JSON>} events
  */
 function getAllEvents() {
     return new Promise(function (resolve) {
@@ -430,7 +435,7 @@ function getAllEvents() {
 
 /**
  * get all users in the partyplaner
- * @returns {Promise<any>} resolve: JSON
+ * @returns {Promise<JSON>} all Users
  */
 function getAllUsers() {
     return new Promise(function (resolve) {
@@ -454,7 +459,7 @@ function getAllUsers() {
  * get a wish of the logged in user in this event
  * @param wishID of the wish you are searching for
  * @param eventID of the wish
- * @returns {Promise<any>} resolve: JSON
+ * @returns {Promise<JSON>} one Wish
  */
 function getWish(wishID, eventID) {
     return new Promise(function (resolve) {
@@ -490,7 +495,7 @@ function postShoppinglist(eventID) {
 /**
  * Takes an array of names and posts each one as a new user
  * @param userNames Array of names
- * @returns {Promise<any>} a Promise that is to be resoled with a JSON that links each name to there location (URI)
+ * @returns {Promise<JSON>} a Promise that is to be resoled with a JSON that links each name to there location (URI)
  */
 function postUsers(userNames) {
     let users = {};
@@ -526,7 +531,7 @@ function postUsers(userNames) {
 /**
  * POST new gvent with given Name
  * @param eventName name of event to be Posted
- * @returns {Promise<any>} A Promise that is to be resolved with a String that contains the location (URI) of the new event
+ * @returns {Promise<String>} A Promise that is to be resolved with a String that contains the location (URI) of the new event
  */
 function postEvent(eventName) {
     let eventLocation;
@@ -552,8 +557,8 @@ function postEvent(eventName) {
 /**
  * Adds multiple users to given event
  * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
- * @param eventlocation URI of Event
- * @returns {Promise<any>} resolve: JSON
+ * @param eventID URI of Event
+ * @returns {Promise<>} null
  */
 function postUsersToEvent(userURIs, eventID) {
 

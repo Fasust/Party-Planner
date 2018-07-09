@@ -33,6 +33,10 @@ router.post('/', function (req, res) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
+   if(!req.body.hasOwnProperty('name')){
+        res.status(400).send('Missing Variable in Body of this POST!');
+        return;
+    }
     // Error handler - end
 
     // Getting return values
@@ -44,7 +48,7 @@ router.post('/', function (req, res) {
     let wishUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+ eventID + "/wishes";
     let shoppingUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+ eventID + "/shoppinglist";
     let userUri = req.protocol + '://' + req.get('host') + req.originalUrl + "/"+ eventID + "/users";
-    event.navigation = {
+    event.links = {
         "users" : userUri,
         "shoppinglist" : shoppingUri,
         "wishes" : wishUri
@@ -57,6 +61,7 @@ router.post('/', function (req, res) {
     // Send the URI of new event
     let uri = req.protocol + '://' + req.get('host') + req.originalUrl + "/" + eventID;
     res.set('location',uri);
+    res.status(201);
     res.json(event);
 });
 
@@ -83,12 +88,12 @@ router.get('/:eid' ,function (req, res) {
 router.put('/:eid' ,function (req, res) {
 
     // Error handler - start
-    if(req.params.eid == null) {
-        res.status(400).send('No valid Event ID!');
-        return;
-    }
     if(req.body == {}) {
         res.status(400).send('Missing Body in this PUT!');
+        return;
+    }
+    if(!req.body.hasOwnProperty('name')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
     // Error handler - end
@@ -148,12 +153,16 @@ router.post('/:eid/wishes', function (req, res) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
-    if(req.body.user == null) {
-        res.status(400).send('No valid User ID!');
+    if(!req.body.hasOwnProperty('user')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    if(req.params.eid == null) {
-        res.status(400).send('No valid Event ID!');
+    if(!req.body.hasOwnProperty('location')){
+        res.status(400).send('Missing Variable in Body of this POST!');
+        return;
+    }
+    if(!req.body.hasOwnProperty('name')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
     // Error handler - end
@@ -174,6 +183,7 @@ router.post('/:eid/wishes', function (req, res) {
     // Send the URI of new event
     let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
     res.set('location',uri);
+    res.status(201);
     res.json(wish);
 });
 
@@ -187,16 +197,16 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
         res.status(400).send('Missing Body in this PUT!');
         return;
     }
-    if(req.body.user == null) {
-        res.status(400).send('No valid User ID!');
+    if(!req.body.hasOwnProperty('user')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    if(req.params.eid == null) {
-        res.status(400).send('No valid Event ID!');
+    if(!req.body.hasOwnProperty('location')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    if(req.params.wid == null) {
-        res.status(400).send('No valid Wish ID!');
+    if(!req.body.hasOwnProperty('name')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
     // Error handler - end
@@ -262,14 +272,11 @@ router.post('/:eid/users', function (req, res) {
         res.status(400).send('Missing Body in this POST!');
         return;
     }
-    if(req.body.user == null) {
-        res.status(400).send('No valid User ID!');
+    if(!req.body.hasOwnProperty('user')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    if(req.params.eid == null) {
-        res.status(400).send('No valid Event ID!');
-        return;
-    }
+
     // Error handler - end
 
     // Getting return values
@@ -293,6 +300,7 @@ router.post('/:eid/users', function (req, res) {
 
     // Send the URI of new event
     res.set('location',uri);
+    res.status(201);
     res.json(user);
 });
 
@@ -306,12 +314,8 @@ router.put('/:eid/users/:uid' ,function (req, res) {
         res.status(400).send('Missing Body in this PUT!');
         return;
     }
-    if(req.params.uid == null) {
-        res.status(400).send('No valid User ID!');
-        return;
-    }
-    if(req.params.eid == null) {
-        res.status(400).send('No valid Event ID!');
+    if(!req.body.hasOwnProperty('user')){
+        res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
     // Error handler - end
@@ -397,21 +401,13 @@ router.post('/:eid/shoppinglist', function (req, res) {
             return;
         }
     });
-
-    if(req.params.eid == null ) {
-        res.status(400).send('No valid Event ID!');
-        return;
-    }
     // Error handler - end
-
 
     //GET all WISHES in EVENT
     let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
     let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
-
-
 
     //Save all User Ids in an Array and Return it
     let userIDs = {};
@@ -442,7 +438,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                 wishes.forEach(wish => {
                     currentLocation = wish.data().location;
                     if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                        if(index >= Object.keys(userIDs).length-1) {
+                        if(index > Object.keys(userIDs).length) {
                             console.log("\n> New Iteration");
                             index = 0;
                         }else{
@@ -462,17 +458,11 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         "wish" :  wishURI,
                         "user" : userURI
                     };
-                    /* To show more detail in the POST (is redundant)
-                    entry.wish = {
-                        "uri": wishURI,
-                        "location": wish.data().location,
-                        "name": wish.data().name
-                    };
-                    */
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
                 //Send Result
+                res.status(201);
                 fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));
             });
     });
