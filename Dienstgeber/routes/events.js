@@ -403,14 +403,11 @@ router.post('/:eid/shoppinglist', function (req, res) {
     });
     // Error handler - end
 
-
     //GET all WISHES in EVENT
     let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
 
     //GET all USERS in EVENT
     let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
-
-
 
     //Save all User Ids in an Array and Return it
     let userIDs = {};
