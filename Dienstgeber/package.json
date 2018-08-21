@@ -24,6 +24,7 @@
     "faye": "^1.2.4",
     "firebase-admin": "5.12.0",
     "fs": "0.0.1-security",
+    "jsonschema": "^1.2.4",
     "readline-sync": "1.4.0",
     "request": "2.87.0",
     "request-promise": "4.2.2"

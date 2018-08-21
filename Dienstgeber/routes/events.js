@@ -13,6 +13,53 @@ const router = express.Router(null);
 //Own
 const fsExtensions = require('../own_modules/firestoreExtensions');
 
+// Validation with JSON Schema
+var Validator = require('jsonschema').Validator;
+var v = new Validator();
+var schema = {
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "JSON Schema",
+    "required": [
+        "location",
+        "name"
+    ],
+    "properties": {
+        "location": {
+            "$id": "#/properties/location",
+            "type": "string",
+            "title": "The Location Schema",
+            "default": "",
+            "examples": [
+                false
+            ],
+            "pattern": "^(.*)$"
+        },
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "title": "The User Schema",
+            "default": "",
+            "examples": [
+                false
+            ],
+            "pattern": "^(.*)$"
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "title": "The Name Schema",
+            "default": "",
+            "examples": [
+                false
+            ],
+            "pattern": "^(.*)$"
+        }
+    }
+};
+
+
 // Init Route
 const ROUTE = "events";
 const ROUTE_WISH = "wishes";
@@ -173,18 +220,39 @@ router.post('/:eid/wishes', function (req, res) {
     let eventID = req.params.eid;
     let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
 
+    // if this event dont have a /shoppinglist Collection throw error
+    /*
+    fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(function (result) {
+        if (result) {
+            console.log("Shoppinglist gibts schon");
+            res.status(423).send('Shoppinglist were already generated!');
+            return;
+        }
+    });
+    */
+
     //Change User ID to URI
     let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
     wish.user = userURI;
 
-    // POST it in Firebase
-    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+    // Validate Wish Object
+    if ( v.validate(wish, schema).errors.length > 0 ) {
+        //console.log(v.validate(wish, schema));
+        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
+        return;
+    } else {
+        console.log("Kein Error beim POST Wish");
+        // POST it in Firebase
+        db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
 
-    // Send the URI of new event
-    let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
-    res.set('location',uri);
-    res.status(201);
-    res.json(wish);
+        // Send the URI of new event
+        let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
+        res.set('location',uri);
+        res.status(201);
+        res.json(wish);
+    }
+
+
 });
 
 /**
