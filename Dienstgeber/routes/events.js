@@ -404,7 +404,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
     // Error handler - end
 
     //GET all WISHES in EVENT
-    let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
+    let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'asc');
 
     //GET all USERS in EVENT
     let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
@@ -429,16 +429,37 @@ router.post('/:eid/shoppinglist', function (req, res) {
 
         wishCollection.get()
             .then(wishes => {
+                let destribution = JSON.parse(JSON.stringify(userIDs)); //clone UserIDS
+                for (let key in destribution){
+
+                    // asinge every user ID a value of 0.
+                    // This will be the number of wishes ever user has  at a given Moment
+                    destribution[key] = 0;
+                }
+
                 let previosLocation = "";
                 let currentLocation = "";
 
-                let index = -1;
+                let index = 0;
 
                 //Match Wishes by Location
                 wishes.forEach(wish => {
                     currentLocation = wish.data().location;
-                    if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                        if(index > Object.keys(userIDs).length) {
+                    if(currentLocation != previosLocation){
+                        console.log("---------------------");
+                        console.log("location: " + currentLocation);
+
+                        //find index of user with smalles amout of wishes
+                        let lowest = 2147483647;
+                        for (let key in destribution){
+
+                            if(Number(destribution[key]) < lowest ){
+                                lowest = destribution[key];
+                                index = key;
+                            }
+                        }
+                        /*
+                        if(index > Object.keys(userIDs).length) { // if more locations than users, loop back around
                             console.log("\n> New Iteration");
                             index = 0;
                         }else{
@@ -446,12 +467,16 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         }
                         console.log("---------------------");
                         console.log("location: " + currentLocation);
+                        */
                     }
 
                     //Turn Wish and user IDs to URIS
                     let wishURI = req.protocol + '://' + req.get('host') + "/events/" + eventID + "/wishes/" + wish.id;
                     let userURI = req.protocol + '://' + req.get('host') + "/users/"  + userIDs[index];
                     console.log("user: " + userIDs[index]+" -> Was Matched to: " + wish.data().name);
+
+                    //save that this user was assinded a new wish
+                    destribution[index] = destribution[index] + 1;
 
                     //add result to firestore
                     let entry = {

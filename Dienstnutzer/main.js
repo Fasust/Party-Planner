@@ -9,8 +9,8 @@ const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 
 // switch of Dienstgeber path with option localhost or heroku
-const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
-//const DIENST_GEBER = 'http://localhost:3000';
+//const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+const DIENST_GEBER = 'http://localhost:3000';
 
 /************************************************************************
  * Main
@@ -125,7 +125,7 @@ function dialog_loggedIn(userID) {
                     }
 
                     let listCounter = 0;
-                    
+
                     let responseMessage =
                         chalk.yellow("----------------------------------------------------\n") +
                         "Your shoppinglist: \n" +
