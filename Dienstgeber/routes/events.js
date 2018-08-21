@@ -16,48 +16,10 @@ const fsExtensions = require('../own_modules/firestoreExtensions');
 // Validation with JSON Schema
 var Validator = require('jsonschema').Validator;
 var v = new Validator();
-var schema = {
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "title": "JSON Schema",
-    "required": [
-        "location",
-        "name"
-    ],
-    "properties": {
-        "location": {
-            "$id": "#/properties/location",
-            "type": "string",
-            "title": "The Location Schema",
-            "default": "",
-            "examples": [
-                false
-            ],
-            "pattern": "^(.*)$"
-        },
-        "user": {
-            "$id": "#/properties/user",
-            "type": "string",
-            "title": "The User Schema",
-            "default": "",
-            "examples": [
-                false
-            ],
-            "pattern": "^(.*)$"
-        },
-        "name": {
-            "$id": "#/properties/name",
-            "type": "string",
-            "title": "The Name Schema",
-            "default": "",
-            "examples": [
-                false
-            ],
-            "pattern": "^(.*)$"
-        }
-    }
-};
+
+// loading JSON Schema File
+var fs = require("fs");
+var schema = JSON.parse(fs.readFileSync('./json_schema.json','utf8'));
 
 
 // Init Route
