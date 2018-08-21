@@ -112,8 +112,20 @@ function dialog_loggedIn(userID) {
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
                 getUserShoppinglist(userID, eventID).then(function (myShoppingList) {
-                    let listCounter = 0;
 
+                    if(myShoppingList == null){ //There is no List
+                        let responseMessage =
+                            chalk.yellow("----------------------------------------------------\n") +
+                            "No List Found\n" +
+                            chalk.yellow("----------------------------------------------------\n");
+                        console.log(responseMessage);
+
+                        //Recursion
+                        dialog_loggedIn(userID);
+                    }
+
+                    let listCounter = 0;
+                    
                     let responseMessage =
                         chalk.yellow("----------------------------------------------------\n") +
                         "Your shoppinglist: \n" +
@@ -367,6 +379,11 @@ function getUserShoppinglist(userID, eventID) {
         rp(options).then(function (allShoppingItems) {
             let myShoppingList = [];
             let arrayCounter = 0;
+
+            //Check if the List is Empty
+            if(Object.keys(allShoppingItems).length === 0){
+                resolve(null);
+            }
 
             for(let key in allShoppingItems){
                 let potentialUserId = uriToID(allShoppingItems[key].user);
