@@ -458,16 +458,6 @@ router.post('/:eid/shoppinglist', function (req, res) {
                                 index = key;
                             }
                         }
-                        /*
-                        if(index > Object.keys(userIDs).length) { // if more locations than users, loop back around
-                            console.log("\n> New Iteration");
-                            index = 0;
-                        }else{
-                            index++;
-                        }
-                        console.log("---------------------");
-                        console.log("location: " + currentLocation);
-                        */
                     }
 
                     //Turn Wish and user IDs to URIS
