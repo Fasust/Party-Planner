@@ -86,7 +86,7 @@ function dialog_loggedIn(userID) {
             dialog_enterEvent(userID).then(res => dialog_loggedIn(userID));
             break;
         case 3:
-            dialog_createNewWish(userID).then(function(){
+            dialog_createWishes(userID).then(function(){
                 console.log("------------------------");
                 dialog_loggedIn(userID);
             });
@@ -95,16 +95,17 @@ function dialog_loggedIn(userID) {
             //Post shoppinglist
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
-                postShoppinglist(eventID);
+                postShoppinglist(eventID).then(function (res) {
+                    let responseMessage =
+                        chalk.blue("----------------------------------------------------\n") +
+                        "The shoppinglists are created now\n " +
+                        chalk.blue("----------------------------------------------------\n");
 
-                let responseMessage =
-                    chalk.blue("----------------------------------------------------\n") +
-                    "The shoppinglists are created now\n " +
-                    chalk.blue("----------------------------------------------------\n");
-                console.log(responseMessage);
+                    console.log(responseMessage);
 
-                //Recursion
-                dialog_loggedIn(userID);
+                    //Recursion
+                    dialog_loggedIn(userID);
+                });
             });
             break;
         case 5:
@@ -122,6 +123,7 @@ function dialog_loggedIn(userID) {
 
                         //Recursion
                         dialog_loggedIn(userID);
+                        return;
                     }
 
                     let listCounter = 0;
@@ -222,9 +224,8 @@ function dialog_enterEvent(userID) {
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
             let eventID = readlineSync.question('Which one do you want to join?\nEventId: ');
-            let users = [];
-            users.push(userID);
-            postUsersToEvent(users, eventID).then(function () {
+
+            postUserToEvent(userID, eventID).then(function () {
                 console.log("User " + chalk.red(userID) + " has been added to event " + chalk.blue(eventID));
                 resolve();
             });
@@ -239,7 +240,7 @@ function dialog_enterEvent(userID) {
  * @param userID of the user logged in
  * @returns {Promise<>} null
  */
-function dialog_createNewWish(userID) {
+function dialog_createWishes(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your " + chalk.blue("Events") + "\n");
@@ -248,39 +249,81 @@ function dialog_createNewWish(userID) {
             console.log(chalk.blue("--------------------------------------"));
             let eventID = readlineSync.question('Where do you want to add new wishes?\nEventId: ');
 
-            console.log("Enter the wishes you want to add to this event (Press ENTER on empty input to abort)");
-
-            let caseSwitch = "nameCase";
-            let name;
-            let location;
-
-
-            while (true) {
-                switch (caseSwitch){
-                    case "nameCase":
-                        name =  readlineSync.question('name: ');
-                        if(name == ""){
-                            resolve();
-                            return;
-                        }
-                        caseSwitch = "locCase";
-                        break;
-                    case "locCase":
-                        location =  readlineSync.question('location: ');
-                        if(location == ""){
-                            resolve();
-                            return;
-                        }
-
-                        postWish(eventID,userID,name,location);
-
-                        caseSwitch = "nameCase";
-                        break;
-                }
-
-            }
+            dialog_createWishLoop(eventID,userID)
+                .catch(function(err){
+                    //Could Not POST - Show Error
+                    console.log(chalk.red(err));
+                    resolve();
+                })
+                .then(function(res){
+                    resolve();
+                });
         });
     });
+}
+
+/**
+ * Creates a Looping Dialog that keeps asking for wishes and will resolve when the user no longer wants to add more
+ * @param eventID event where the wishes are added to
+ * @param userID the adding user
+ * @return {Promise<any>} will resole on null or reject with the status code of the Response to POST
+ */
+function dialog_createWishLoop(eventID, userID) {
+    return new Promise(function (resolve, reject) {
+        console.log("Enter the wishes you want to add to this event (Press ENTER on empty input to abort)");
+
+        let caseSwitch = "nameCase";
+        let name;
+        let location;
+
+        let wishes = {};
+        let wishCount = 0;
+        let run = true;
+
+        //Collect Users Wishes in JSON
+        while (run){
+            switch (caseSwitch){
+                case "nameCase":
+                    name =  readlineSync.question('name: ');
+                    if(name == ""){
+                        run = false;
+                        break;
+                    }
+                    caseSwitch = "locCase";
+                    break;
+                case "locCase":
+                    location =  readlineSync.question('location: ');
+                    if(location == ""){
+                        run = false;
+                        break;
+                    }
+
+                    //Add wish to JSON
+                    wishes[wishCount++] = {location, name};
+
+                    caseSwitch = "nameCase";
+                    break;
+            }
+        }
+
+        //POST all wishes in JSON
+        let sucCount = 0;
+        for(let w in wishes){
+            postWish(eventID,userID,wishes[w].name,wishes[w].location)
+                .then(function (res) {
+                    sucCount++;
+
+                    if(sucCount >= wishCount){ //Check if all wishes have been posted
+                        resolve();
+                    }
+                })
+                .catch(function (err) {
+                    reject(err);
+                })
+        }
+
+    });
+
 }
 
 /**
@@ -498,15 +541,21 @@ function getWish(wishID, eventID) {
 /**
  * Post on the events /shoppinglist to create it with all wishes
  * @param eventID of the shoppinglist
+ * @returns Promise so you can wait for the POST to be successfull
  */
 function postShoppinglist(eventID) {
-    let options = {
-        method: 'POST',
-        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
-        json: true, // Automatically stringifies the body to JSON
-        resolveWithFullResponse: true
-    };
-    rp(options);
+    return new Promise(function (resolve, reject) {
+        let options = {
+            method: 'POST',
+            uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+            json: true, // Automatically stringifies the body to JSON
+            resolveWithFullResponse: true
+        };
+
+        rp(options).then(function () {
+            resolve();
+        });
+    });
 }
 
 /**
@@ -572,34 +621,27 @@ function postEvent(eventName) {
 }
 
 /**
- * Adds multiple users to given event
- * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
+ * Adds a users to given event
+ * @param userID string that contains the ID of a user
  * @param eventID URI of Event
  * @returns {Promise<>} null
  */
-function postUsersToEvent(userURIs, eventID) {
+function postUserToEvent(userID, eventID) {
+    let json = {};
+    json.user = userID;
 
     let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events/' + eventID + '/users',
-        json: true, // Automatically stringifies the body to JSON
+        json: true, // Automatically stringifies the body to JSON,
+        body: json,
         resolveWithFullResponse: true
     };
     return new Promise((resolve, reject) => {  //Build Promise
 
-        for (let key in userURIs){ //Iterate through all User names in req
-
-            let userName = key;
-            let userURI = userURIs[key];
-
-            options.body = {'user': uriToID(userURI)}; //Get Id of each User
-
-
-            rp(options);
-            console.log(options.body);
-
-        }
-        resolve();
+        rp(options).then(function (res) {
+            resolve();
+        });
     });
 }
 
@@ -609,6 +651,7 @@ function postUsersToEvent(userURIs, eventID) {
  * @param userID of the user that is logged in
  * @param name of the wish (e.g. water)
  * @param location of the shop where you can buy this wish (e.g. market)
+ * @returns {Promise<String>} when failed it returns the error
  */
 function postWish(eventID,userID,name,location) {
     //Build base Options
@@ -622,5 +665,15 @@ function postWish(eventID,userID,name,location) {
         json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true
     };
-    rp(options);
+    return new Promise((resolve, reject) => {  //Build Promise
+        rp(options)
+            .then(function () {
+                // POST success
+                resolve();
+            })
+            .catch(function (err) {
+                // POST fail
+                reject(err);
+            });
+    });
 }
