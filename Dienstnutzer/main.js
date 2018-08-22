@@ -7,15 +7,33 @@
 const rp = require('request-promise');
 const chalk = require('chalk');
 const readlineSync = require('readline-sync');
+const faye = require('faye');
+
 
 // switch of Dienstgeber path with option localhost or heroku
 //const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
 const DIENST_GEBER = 'http://localhost:3000';
 
+//Init Faye
+let fayeClient = new faye.Client(DIENST_GEBER + '/faye', {timeout: 120});
+fayeClient.connect();
+
 /************************************************************************
  * Main
  ************************************************************************/
+//Faye Testing-----
+let subscription = fayeClient.subscribe('/test', function(message) {
+    console.log('recieved on : ' + message.channel + " | " + message.text);
+});
 
+
+subscription.then(function() {
+    console.log('[SUBSCRIBE SUCCEEDED]');
+}).catch(function() {
+    console.log('[SUBSCRIBE not SUCCEEDED]');
+});
+
+/*
 // --------------------------------------------- Start Display in Terminal where you can Login or Register
 console.log(
     chalk.magenta('-------------------------\n') +
