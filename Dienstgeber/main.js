@@ -43,7 +43,8 @@ const eventsRouter = require('./routes/events');
 
 //Faye Test-----
 bayeux.getClient().subscribe('/**', function(message) {
-    console.log('recieved on : ' + message.channel + " | " + message.text);
+    console.log('recieved on : ' + message.event );
+    console.log(message.shoppinglist);
 });
 
 initServer();
@@ -60,14 +61,6 @@ app.get('/', function (req, res) {
             "users" : req.protocol + '://' + req.get('host') + req.originalUrl  + "users"
         }
     };
-
-
-    //Faye Test-------
-    bayeux.getClient().publish('/test', {text: "testing", channel: "/test"})
-        .then(res => console.log("publish success"))
-        .catch(err => console.log("publish fail"));
-
-
     res.json(welcome);
 });
 

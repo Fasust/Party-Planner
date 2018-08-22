@@ -10,16 +10,19 @@ const db = admin.firestore();
 const express = require("express");
 const router = express.Router(null);
 
+//Faye
+const faye = require('faye');
+
 //Own
 const fsExtensions = require('../own_modules/firestoreExtensions');
 
 // Validation with JSON Schema
-var Validator = require('jsonschema').Validator;
-var v = new Validator();
+let Validator = require('jsonschema').Validator;
+let v = new Validator();
 
 // loading JSON Schema File
-var fs = require("fs");
-var schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
+let fs = require("fs");
+let schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
 
 
 // Init Route
@@ -486,6 +489,8 @@ router.post('/:eid/shoppinglist', function (req, res) {
                 let previosLocation = "";
                 let currentLocation = "";
 
+                let shoppingList = [];
+
                 let index = 0;
 
                 //Match Wishes by Location
@@ -519,9 +524,15 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         "wish" :  wishURI,
                         "user" : userURI
                     };
+                    shoppingList.push(entry);
+
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
+                //Publish on Faye
+                let client = new faye.Client(req.protocol + '://' + req.get('host') + '/faye');
+                client.publish('/' + eventID, {event: eventID, shoppinglist: shoppingList});
+
                 //Send Result
                 res.status(201);
                 fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));

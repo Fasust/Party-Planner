@@ -47,8 +47,8 @@ if (cluster.isMaster) {
 
 }else{
     //Faye Testing-----
-    let subscription = fayeClient.subscribe('/test', function(message) {
-        console.log('recieved on : ' + message.channel + " | " + message.text);
+    let subscription = fayeClient.subscribe('/wuRLDEPdhS0Y9S2NHQXg', function(message) {
+        console.log('recieved on : ' + message.event + " | " + message.shoppinglist);
     });
 }
 
