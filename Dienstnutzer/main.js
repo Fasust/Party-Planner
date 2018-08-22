@@ -55,14 +55,13 @@ if(cluster.isMaster){
     subscribeToEvent(process.env.event);
 }
 
-// --------------------------------------------- Start Display in Terminal where you can Login or Register
 
 
 /************************************************************************
  * Functions
  ************************************************************************/
 
-// --------------------------------------------- Dialoges the user can walk through in the partyplaner
+//  Dialoges the user can walk through in the partyplaner ---------------------------------------------
 
 /**
  * show dialoge for the user that is logged in with possible interactions
@@ -409,7 +408,7 @@ function createNewEventAndAddUsers() {
 
 }
 
-// --------------------------------------------- Helper Functions and Ressource operations from the Dienstnutzer
+//  Helper Functions and Ressource operations from the Dienstnutzer ---------------------------------------------
 
 /**
  * Cuts a URI (URL) at its last "/" and returns the following part of the string
@@ -697,6 +696,10 @@ function postWish(eventID,userID,name,location) {
     });
 }
 
+/**
+ * subscribes this Client to the Faye Push Notifications of an Event
+ * @param eventID
+ */
 function subscribeToEvent(eventID) {
     let subscription = fayeClient.subscribe('/' +  eventID, function(message) {
         console.log(chalk.green('\n*************************'));
@@ -705,6 +708,11 @@ function subscribeToEvent(eventID) {
     });
 }
 
+/**
+ * Subscribes this Client to all the Faye Push Notification of the Events a given user takes part in
+ * @param userID
+ * @return {Promise<null>}
+ */
 function subUserToAllCurrentEvents(userID) {
     return new Promise(function (resolve, reject) {
         getEventsOfUser(userID).then(function (res) {
