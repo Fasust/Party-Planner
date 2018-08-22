@@ -41,12 +41,6 @@ const eventsRouter = require('./routes/events');
  * Main
  ************************************************************************/
 
-//Faye Test-----
-bayeux.getClient().subscribe('/**', function(message) {
-    console.log('recieved on : ' + message.event );
-    console.log(message.shoppinglist);
-});
-
 initServer();
 setRoutes();
 
