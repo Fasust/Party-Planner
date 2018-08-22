@@ -23,9 +23,15 @@ fayeClient.connect();
  * Main
  ************************************************************************/
 
-if (cluster.isMaster) {
-    cluster.fork();
-
+/**
+ * In Our Projekt we have to main Processes Running at all Time:
+ * One to handle the Synchones Input of th User. This is the the Dialoge Tree Through which a user can Navigate.
+ * The Seconde one is to Handle The A-Sychones Push Notifications from our Faye Server.
+ * At This Point Here the 2 Processes are split. We use te Mudule "Cluster" to make to Symultanioslyrunning Processes Possible.
+ * When ever a new Faye-Subscribtion is opend, we slit of a new Process to handle the Notification for that specific event.
+ * the Split-of-Process Arrives here at the Top of the Programm and enters into the "else" branch.
+ */
+if(cluster.isMaster){
     console.log(
         chalk.magenta('-------------------------\n') +
         '- Welcome to the Worlds -\n' +
@@ -46,14 +52,8 @@ if (cluster.isMaster) {
     }
 
 }else{
-    //Faye Testing-----
-    let subscription = fayeClient.subscribe('/wuRLDEPdhS0Y9S2NHQXg', function(message) {
-        console.log('recieved on : ' + message.event + " | " + message.shoppinglist);
-    });
+    subscribeToEvent(process.env.event);
 }
-
-
-
 
 // --------------------------------------------- Start Display in Terminal where you can Login or Register
 
@@ -117,12 +117,6 @@ function dialog_loggedIn(userID) {
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
                 postShoppinglist(eventID).then(function (res) {
-                    let responseMessage =
-                        chalk.blue("----------------------------------------------------\n") +
-                        "The shoppinglists are created now\n " +
-                        chalk.blue("----------------------------------------------------\n");
-
-                    console.log(responseMessage);
 
                     //Recursion
                     dialog_loggedIn(userID);
@@ -171,7 +165,6 @@ function dialog_loggedIn(userID) {
                 });
 
             });
-
             break;
     }
 }
@@ -192,7 +185,8 @@ function dialog_login() {
             console.log(chalk.red("--------------------------------------"));
             let userID = readlineSync.question('As which one do you want to act?\nUserId: ');
 
-            resolve(userID);
+            subUserToAllCurrentEvents(userID).then(res => resolve(userID));
+
         });
     });
 
@@ -248,6 +242,10 @@ function dialog_enterEvent(userID) {
 
             postUserToEvent(userID, eventID).then(function () {
                 console.log("User " + chalk.red(userID) + " has been added to event " + chalk.blue(eventID));
+
+                //Split of the Process for handling the Faye Subscribtion
+                cluster.fork({event : eventID});
+
                 resolve();
             });
         });
@@ -697,4 +695,24 @@ function postWish(eventID,userID,name,location) {
                 reject(err);
             });
     });
+}
+
+function subscribeToEvent(eventID) {
+    let subscription = fayeClient.subscribe('/' +  eventID, function(message) {
+        console.log(chalk.green('\n*************************'));
+        console.log('The Shoppinglist of Event:\n' + chalk.blue(message.event) + "\nis now Ready.");
+        console.log(chalk.green('*************************'));
+    });
+}
+
+function subUserToAllCurrentEvents(userID) {
+    return new Promise(function (resolve, reject) {
+        getEventsOfUser(userID).then(function (res) {
+            for(let id in res){
+                cluster.fork({event : id});
+            }
+            resolve();
+        });
+    });
+
 }
