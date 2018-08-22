@@ -157,7 +157,7 @@ router.get('/:eid/wishes/:wid', function (req, res) {
  */
 router.post('/:eid/wishes', function (req, res) {
 
-    // Validation - start
+    // Validation - start-----------------------
     if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
@@ -179,38 +179,40 @@ router.post('/:eid/wishes', function (req, res) {
         res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
         return;
     }
-    // Validation - end
+    // Validation - end-------------------
 
-    // Getting return values
-    let wish = req.body; //JSON in Body
-    let userID = wish.user;
-    let eventID = req.params.eid;
-    let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+    //Check if a shopping list has already been generated
+    db.collection('events').doc(req.params.eid).collection('shoppinglist').get().
+    then(shop => {
+        if (shop.docs.length > 0) {
 
-    // if this event dont have a /shoppinglist Collection throw error
-    /*
-    fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(function (result) {
-        if (result) {
-            console.log("Shoppinglist gibts schon");
-            res.status(423).send('Shoppinglist were already generated!');
-            return;
+            //Shopping List exists
+            res.status(423).send('Shoppinglist was already generated: No Longer Allowed to Submit Wishes.');
+
+        }else{
+            //Shopping List Dose Not exist
+
+            // Getting return values
+            let wish = req.body; //JSON in Body
+            let userID = wish.user;
+            let eventID = req.params.eid;
+            let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+
+            //Change User ID to URI
+            let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+            wish.user = userURI;
+
+            // POST it in Firebase
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+
+            // Send the URI of new event
+            let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
+            res.set('location',uri);
+            res.status(201);
+            res.json(wish);
+
         }
     });
-    */
-
-    //Change User ID to URI
-    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
-    wish.user = userURI;
-
-    // POST it in Firebase
-    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
-
-    // Send the URI of new event
-    let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
-    res.set('location',uri);
-    res.status(201);
-    res.json(wish);
-
 });
 
 /**
@@ -242,18 +244,31 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
     }
     // Validation - end
 
-    // Getting return values
-    let eventID = req.params.eid;
-    let wishID = req.params.wid;
-    let newWish = req.body;
-    let userID = newWish.user;
+    //Check if a shopping list has already been generated
+    db.collection('events').doc(req.params.eid).collection('shoppinglist').get().
+    then(shop => {
+        if (shop.docs.length > 0) {
 
-    //Change User ID to URI
-    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
-    newWish.user = userURI;
+            //Shopping List exists
+            res.status(423).send('Shoppinglist was already generated: No Longer Allowed to Change Wishes.');
 
-    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
-    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+        }else{
+            //Shoppinglist dose not Exist
+
+            // Getting return values
+            let eventID = req.params.eid;
+            let wishID = req.params.wid;
+            let newWish = req.body;
+            let userID = newWish.user;
+
+            //Change User ID to URI
+            let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+            newWish.user = userURI;
+
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
+            fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+        }
+    });
 });
 
 /**
