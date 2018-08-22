@@ -19,7 +19,7 @@ var v = new Validator();
 
 // loading JSON Schema File
 var fs = require("fs");
-var schema = JSON.parse(fs.readFileSync('./json_schema.json','utf8'));
+var schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
 
 
 // Init Route
@@ -157,7 +157,7 @@ router.get('/:eid/wishes/:wid', function (req, res) {
  */
 router.post('/:eid/wishes', function (req, res) {
 
-    // Error handler - start
+    // Validation - start
     if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
@@ -174,7 +174,12 @@ router.post('/:eid/wishes', function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    // Error handler - end
+    //JSON Schema
+    if ( v.validate(req.body, schema).errors.length > 0 ) {
+        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
+        return;
+    }
+    // Validation - end
 
     // Getting return values
     let wish = req.body; //JSON in Body
@@ -197,23 +202,14 @@ router.post('/:eid/wishes', function (req, res) {
     let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
     wish.user = userURI;
 
-    // Validate Wish Object
-    if ( v.validate(wish, schema).errors.length > 0 ) {
-        //console.log(v.validate(wish, schema));
-        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
-        return;
-    } else {
-        console.log("Kein Error beim POST Wish");
-        // POST it in Firebase
-        db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+    // POST it in Firebase
+    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
 
-        // Send the URI of new event
-        let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
-        res.set('location',uri);
-        res.status(201);
-        res.json(wish);
-    }
-
+    // Send the URI of new event
+    let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
+    res.set('location',uri);
+    res.status(201);
+    res.json(wish);
 
 });
 
@@ -222,9 +218,9 @@ router.post('/:eid/wishes', function (req, res) {
  */
 router.put('/:eid/wishes/:wid' ,function (req, res) {
 
-    // Error handler - start
+    // Validation - start
     if(req.body == {}) {
-        res.status(400).send('Missing Body in this PUT!');
+        res.status(400).send('Missing Body in this POST!');
         return;
     }
     if(!req.body.hasOwnProperty('user')){
@@ -239,7 +235,12 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    // Error handler - end
+    //JSON Schema
+    if ( v.validate(req.body, schema).errors.length > 0 ) {
+        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
+        return;
+    }
+    // Validation - end
 
     // Getting return values
     let eventID = req.params.eid;
