@@ -17,12 +17,12 @@ const faye = require('faye');
 const fsExtensions = require('../own_modules/firestoreExtensions');
 
 // Validation with JSON Schema
-let Validator = require('jsonschema').Validator;
-let v = new Validator();
+const Validator = require('jsonschema').Validator;
+const v = new Validator();
 
 // loading JSON Schema File
-let fs = require("fs");
-let schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
+const fs = require("fs");
+const schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
 
 
 // Init Route
