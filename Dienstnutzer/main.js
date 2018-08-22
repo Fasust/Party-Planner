@@ -8,6 +8,7 @@ const rp = require('request-promise');
 const chalk = require('chalk');
 const readlineSync = require('readline-sync');
 const faye = require('faye');
+const cluster = require('cluster');
 
 
 // switch of Dienstgeber path with option localhost or heroku
@@ -21,38 +22,40 @@ fayeClient.connect();
 /************************************************************************
  * Main
  ************************************************************************/
-//Faye Testing-----
-let subscription = fayeClient.subscribe('/test', function(message) {
-    console.log('recieved on : ' + message.channel + " | " + message.text);
-});
 
+if (cluster.isMaster) {
+    cluster.fork();
 
-subscription.then(function() {
-    console.log('[SUBSCRIBE SUCCEEDED]');
-}).catch(function() {
-    console.log('[SUBSCRIBE not SUCCEEDED]');
-});
+    console.log(
+        chalk.magenta('-------------------------\n') +
+        '- Welcome to the Worlds -\n' +
+        '- Greatest Partyplaner  -\n' +
+        chalk.magenta('-------------------------'));
 
-/*
-// --------------------------------------------- Start Display in Terminal where you can Login or Register
-console.log(
-    chalk.magenta('-------------------------\n') +
-    '- Welcome to the Worlds -\n' +
-    '- Greatest Partyplaner  -\n' +
-    chalk.magenta('-------------------------'));
+    let selectOptions = ['Login','Register'];
+    let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
-let selectOptions = ['Login','Register'];
-let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
+    // Switch-case for the option the user selected
+    switch (select){
+        case 0:
+            dialog_login().then( id => dialog_loggedIn(id));
+            break;
+        case 1:
+            dialog_register().then( id => dialog_loggedIn(id));
+            break;
+    }
 
-// Switch-case for the option the user selected
-switch (select){
-    case 0:
-        dialog_login().then( id => dialog_loggedIn(id));
-        break;
-    case 1:
-        dialog_register().then( id => dialog_loggedIn(id));
-        break;
+}else{
+    //Faye Testing-----
+    let subscription = fayeClient.subscribe('/test', function(message) {
+        console.log('recieved on : ' + message.channel + " | " + message.text);
+    });
 }
+
+
+
+
+// --------------------------------------------- Start Display in Terminal where you can Login or Register
 
 
 /************************************************************************
