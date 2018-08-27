@@ -10,8 +10,19 @@ const db = admin.firestore();
 const express = require("express");
 const router = express.Router(null);
 
-//Own
+// Faye
+const faye = require('faye');
+
+// Own
 const fsExtensions = require('../own_modules/firestoreExtensions');
+
+// Validation with JSON Schema
+const Validator = require('jsonschema').Validator;
+const v = new Validator();
+
+// loading JSON Schema file
+const fs = require("fs");
+const schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
 
 // Init Route
 const ROUTE = "events";
@@ -167,24 +178,45 @@ router.post('/:eid/wishes', function (req, res) {
     }
     // Error handler - end
 
-    // Getting return values
-    let wish = req.body; //JSON in Body
-    let userID = wish.user;
-    let eventID = req.params.eid;
-    let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+    // JSON Schema Validation - start
+    if ( v.validate(req.body, schema).errors.length > 0 ) {
+        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
+        return;
+    }
+    // JSON Schema Validation - end
 
-    //Change User ID to URI
-    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
-    wish.user = userURI;
+    // Check if a shoppinglist has already been generated
+    db.collection('events').doc(req.params.eid).collection('shoppinglist').get().
+    then(shop => {
+        if (shop.docs.length > 0) {
 
-    // POST it in Firebase
-    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+            // shoppinglist exists
+            res.status(423).send('Shoppinglist was already generated: No Longer Allowed to Submit Wishes.');
 
-    // Send the URI of new event
-    let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
-    res.set('location',uri);
-    res.status(201);
-    res.json(wish);
+        } else {
+            // shoppinglist does not exist
+
+            // Getting return values
+            let wish = req.body; //JSON in Body
+            let userID = wish.user;
+            let eventID = req.params.eid;
+            let wishID = fsExtensions.getIdInCollection(ROUTE + "/" + eventID + "/" + ROUTE_WISH);
+
+            //Change User ID to URI
+            let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+            wish.user = userURI;
+
+            // POST it in Firebase
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(wish);
+
+            // Send the URI of new event
+            let uri = req.protocol + '://' + req.get('host')+ req.originalUrl +"/" + wishID;
+            res.set('location',uri);
+            res.status(201);
+            res.json(wish);
+
+        }
+    });
 });
 
 /**
@@ -192,9 +224,9 @@ router.post('/:eid/wishes', function (req, res) {
  */
 router.put('/:eid/wishes/:wid' ,function (req, res) {
 
-    // Error handler - start
+    // Validation - start
     if(req.body == {}) {
-        res.status(400).send('Missing Body in this PUT!');
+        res.status(400).send('Missing Body in this POST!');
         return;
     }
     if(!req.body.hasOwnProperty('user')){
@@ -209,20 +241,38 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    // Error handler - end
+    // JSON Schema
+    if ( v.validate(req.body, schema).errors.length > 0 ) {
+        res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
+        return;
+    }
+    // Validation - end
 
-    // Getting return values
-    let eventID = req.params.eid;
-    let wishID = req.params.wid;
-    let newWish = req.body;
-    let userID = newWish.user;
+    //Check if a shopping list has already been generated
+    db.collection('events').doc(req.params.eid).collection('shoppinglist').get().
+    then(shop => {
+        if (shop.docs.length > 0) {
 
-    //Change User ID to URI
-    let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
-    newWish.user = userURI;
+            //Shopping List exists
+            res.status(423).send('Shoppinglist was already generated: No Longer Allowed to Change Wishes.');
 
-    db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
-    fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+        }else{
+            //Shoppinglist dose not Exist
+
+            // Getting return values
+            let eventID = req.params.eid;
+            let wishID = req.params.wid;
+            let newWish = req.body;
+            let userID = newWish.user;
+
+            //Change User ID to URI
+            let userURI = req.protocol + '://' + req.get('host') +"/users/" + userID;
+            newWish.user = userURI;
+
+            db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).doc(wishID).set(newWish);
+            fsExtensions.getDokumentAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_WISH, wishID).then(result => res.json(result));
+        }
+    });
 });
 
 /**
@@ -404,7 +454,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
     // Error handler - end
 
     //GET all WISHES in EVENT
-    let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'desc');
+    let wishCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_WISH).orderBy('location', 'asc');
 
     //GET all USERS in EVENT
     let userCollection = db.collection(ROUTE).doc(eventID).collection(ROUTE_USER);
@@ -429,23 +479,37 @@ router.post('/:eid/shoppinglist', function (req, res) {
 
         wishCollection.get()
             .then(wishes => {
+                let destribution = JSON.parse(JSON.stringify(userIDs)); //clone UserIDS
+                for (let key in destribution){
+
+                    // assign every user ID a value of 0.
+                    // This will be the number of wishes ever user has  at a given Moment
+                    destribution[key] = 0;
+                }
+
                 let previosLocation = "";
                 let currentLocation = "";
 
-                let index = -1;
+                let shoppingList = [];
+
+                let index = 0;
 
                 //Match Wishes by Location
                 wishes.forEach(wish => {
                     currentLocation = wish.data().location;
-                    if(currentLocation != previosLocation){ // if more locations than users, loop back around
-                        if(index > Object.keys(userIDs).length) {
-                            console.log("\n> New Iteration");
-                            index = 0;
-                        }else{
-                            index++;
-                        }
+                    if(currentLocation != previosLocation){
                         console.log("---------------------");
                         console.log("location: " + currentLocation);
+
+                        //find index of user with smallest amount of wishes
+                        let lowest = 2147483647;
+                        for (let key in destribution){
+
+                            if(Number(destribution[key]) < lowest ){
+                                lowest = destribution[key];
+                                index = key;
+                            }
+                        }
                     }
 
                     //Turn Wish and user IDs to URIS
@@ -453,14 +517,23 @@ router.post('/:eid/shoppinglist', function (req, res) {
                     let userURI = req.protocol + '://' + req.get('host') + "/users/"  + userIDs[index];
                     console.log("user: " + userIDs[index]+" -> Was Matched to: " + wish.data().name);
 
+                    //save that this user was assinded a new wish
+                    destribution[index] = destribution[index] + 1;
+
                     //add result to firestore
                     let entry = {
                         "wish" :  wishURI,
                         "user" : userURI
                     };
+                    shoppingList.push(entry);
+
                     db.collection(ROUTE).doc(eventID).collection(ROUTE_SHOP).doc(wish.id).set(entry);
                     previosLocation = currentLocation;
                 });
+                //Publish on Faye
+                let client = new faye.Client(req.protocol + '://' + req.get('host') + '/faye');
+                client.publish('/' + eventID, {event: eventID, shoppinglist: shoppingList});
+
                 //Send Result
                 res.status(201);
                 fsExtensions.getCollectionAsJSON(ROUTE + '/' + eventID + '/' + ROUTE_SHOP).then(result => res.json(result));

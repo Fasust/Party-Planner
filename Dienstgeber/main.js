@@ -21,36 +21,27 @@ const db = admin.firestore();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
 
 const PORT = process.env.PORT || 3000;
+
+// Init Faye
+const faye = require('faye');
+const http = require('http');
+const server =  http.createServer(app);
+const bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
+
+bayeux.attach(server);
 
 // Init Route
 const usersRouter = require('./routes/users');
 const eventsRouter = require('./routes/events');
 
-/************************************************************************
- * Faye server
- ************************************************************************/
-/*let http = require('http'); //TODO: Faye server konfigurieren(?)
-let faye = require('faye');
 
-let server = http.createServer(),
-    bayeux = new faye.NodeAdapter({mount: 'faye', timeout:45});
-
-
-bayeux.attach(server);
-server.listen(8000);
-console.log("Faye server listening on port 8000");
-*/
 /************************************************************************
  * Main
  ************************************************************************/
 
-initExpress();
+initServer();
 setRoutes();
 
 /**
@@ -64,7 +55,6 @@ app.get('/', function (req, res) {
             "users" : req.protocol + '://' + req.get('host') + req.originalUrl  + "users"
         }
     };
-
     res.json(welcome);
 });
 
@@ -75,11 +65,12 @@ app.get('/', function (req, res) {
 /**
  * Initialize Express: Listen on port, init Log, init error handling
  */
-function initExpress() {
+function initServer() {
 
-    app.listen(PORT, function () {
-        console.log('--Listening on port 3000--');
-    });
+    app.use( bodyParser.json() );       // to support JSON-encoded bodies
+    app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+        extended: true
+    }));
 
     // Error Handler
     app.use(function(err, req, res, next) {
@@ -92,6 +83,11 @@ function initExpress() {
         console.log("Time: \t" + Date.now() + "\t| Request-path:\t" + req.path);
         next();
     });
+
+    server.listen(PORT, function () {
+        console.log('--Listening on port 3000--');
+    });
+
 }
 
 /**

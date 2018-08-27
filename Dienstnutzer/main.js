@@ -6,42 +6,61 @@
 
 const rp = require('request-promise');
 const chalk = require('chalk');
-const readlineSync = require('readline-sync'); 
+const readlineSync = require('readline-sync');
+const faye = require('faye');
+const cluster = require('cluster');
 
 // switch of Dienstgeber path with option localhost or heroku
 //const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
 const DIENST_GEBER = 'http://localhost:3000';
 
+//Init Faye
+let fayeClient = new faye.Client(DIENST_GEBER + '/faye', {timeout: 120});
+fayeClient.connect();
+
 /************************************************************************
  * Main
  ************************************************************************/
 
-// --------------------------------------------- Start Display in Terminal where you can Login or Register
-console.log(
-    chalk.magenta('-------------------------\n') +
-    '- Welcome to the Worlds -\n' +
-    '- Greatest Partyplaner  -\n' +
-    chalk.magenta('-------------------------'));
+/**
+ * In our project we have two main processes tunning all the time:
+ * First one to handle the synchones input of the user. This is the dialoge tree which a user can navigate through the program.
+ * The second one is to handle the asychronous Push Notifications from our Faye Server.
+ * At this point here the two processes are split. We use te module "Cluster" to make to symultaniously running processes possible.
+ * When ever a new Faye-Subscribtion is opened, we split of a new process to handle the notification for that specific event.
+ * the split-of-process arrives here at the top of the program and enters into the "else" case.
+ */
+if(cluster.isMaster) {
+    console.log(
+        chalk.magenta('-------------------------\n') +
+        '- Welcome to the Worlds -\n' +
+        '- Greatest Partyplaner  -\n' +
+        chalk.magenta('-------------------------'));
 
-let selectOptions = ['Login','Register'];
-let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
+    let selectOptions = ['Login','Register'];
+    let select = readlineSync.keyInSelect(selectOptions, 'What do you want to do? ');
 
-// Switch-case for the option the user selected
-switch (select){
-    case 0:
-        dialog_login().then( id => dialog_loggedIn(id));
-        break;
-    case 1:
-        dialog_register().then( id => dialog_loggedIn(id));
-        break;
+    // Switch-case for the option the user selected
+    switch (select){
+        case 0:
+            dialog_login().then( id => dialog_loggedIn(id));
+            break;
+        case 1:
+            dialog_register().then( id => dialog_loggedIn(id));
+            break;
+    }
+
+} else {
+    subscribeToEvent(process.env.event);
 }
+
 
 
 /************************************************************************
  * Functions
  ************************************************************************/
 
-// --------------------------------------------- Dialoges the user can walk through in the partyplaner
+//  Dialoges the user can walk through in the partyplaner ---------------------------------------------
 
 /**
  * show dialoge for the user that is logged in with possible interactions
@@ -86,7 +105,7 @@ function dialog_loggedIn(userID) {
             dialog_enterEvent(userID).then(res => dialog_loggedIn(userID));
             break;
         case 3:
-            dialog_createNewWish(userID).then(function(){
+            dialog_createWishes(userID).then(function(){
                 console.log("------------------------");
                 dialog_loggedIn(userID);
             });
@@ -95,16 +114,11 @@ function dialog_loggedIn(userID) {
             //Post shoppinglist
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
-                postShoppinglist(eventID);
+                postShoppinglist(eventID).then(function (res) {
 
-                let responseMessage =
-                    chalk.blue("----------------------------------------------------\n") +
-                    "The shoppinglists are created now\n " +
-                    chalk.blue("----------------------------------------------------\n");
-                console.log(responseMessage);
-
-                //Recursion
-                dialog_loggedIn(userID);
+                    //Recursion
+                    dialog_loggedIn(userID);
+                });
             });
             break;
         case 5:
@@ -112,6 +126,19 @@ function dialog_loggedIn(userID) {
             dialog_chooseOneEvent(userID).then(function (eventID) {
 
                 getUserShoppinglist(userID, eventID).then(function (myShoppingList) {
+
+                    if(myShoppingList == null){ //There is no List
+                        let responseMessage =
+                            chalk.yellow("----------------------------------------------------\n") +
+                            "No List Found\n" +
+                            chalk.yellow("----------------------------------------------------\n");
+                        console.log(responseMessage);
+
+                        //Recursion
+                        dialog_loggedIn(userID);
+                        return;
+                    }
+
                     let listCounter = 0;
 
                     let responseMessage =
@@ -136,7 +163,6 @@ function dialog_loggedIn(userID) {
                 });
 
             });
-
             break;
     }
 }
@@ -157,7 +183,8 @@ function dialog_login() {
             console.log(chalk.red("--------------------------------------"));
             let userID = readlineSync.question('As which one do you want to act?\nUserId: ');
 
-            resolve(userID);
+            subUserToAllCurrentEvents(userID).then(res => resolve(userID));
+
         });
     });
 
@@ -210,10 +237,13 @@ function dialog_enterEvent(userID) {
             console.log(events);
             console.log(chalk.blue("--------------------------------------"));
             let eventID = readlineSync.question('Which one do you want to join?\nEventId: ');
-            let users = [];
-            users.push(userID);
-            postUsersToEvent(users, eventID).then(function () {
+
+            postUserToEvent(userID, eventID).then(function () {
                 console.log("User " + chalk.red(userID) + " has been added to event " + chalk.blue(eventID));
+
+                // Split of the process for handling the Faye subscription
+                cluster.fork({event : eventID});
+
                 resolve();
             });
         });
@@ -227,7 +257,7 @@ function dialog_enterEvent(userID) {
  * @param userID of the user logged in
  * @returns {Promise<>} null
  */
-function dialog_createNewWish(userID) {
+function dialog_createWishes(userID) {
     return new Promise(function (resolve) {
         getEventsOfUser(userID).then(function (events) {
             console.log("These are all your " + chalk.blue("Events") + "\n");
@@ -236,39 +266,81 @@ function dialog_createNewWish(userID) {
             console.log(chalk.blue("--------------------------------------"));
             let eventID = readlineSync.question('Where do you want to add new wishes?\nEventId: ');
 
-            console.log("Enter the wishes you want to add to this event (Press ENTER on empty input to abort)");
-
-            let caseSwitch = "nameCase";
-            let name;
-            let location;
-
-
-            while (true) {
-                switch (caseSwitch){
-                    case "nameCase":
-                        name =  readlineSync.question('name: ');
-                        if(name == ""){
-                            resolve();
-                            return;
-                        }
-                        caseSwitch = "locCase";
-                        break;
-                    case "locCase":
-                        location =  readlineSync.question('location: ');
-                        if(location == ""){
-                            resolve();
-                            return;
-                        }
-
-                        postWish(eventID,userID,name,location);
-
-                        caseSwitch = "nameCase";
-                        break;
-                }
-
-            }
+            dialog_createWishLoop(eventID,userID)
+                .catch(function(err){
+                    //Could Not POST - Show Error
+                    console.log(chalk.red(err));
+                    resolve();
+                })
+                .then(function(res){
+                    resolve();
+                });
         });
     });
+}
+
+/**
+ * Creates a looping dialoge that keeps asking for wishes and will resolve, when the user no longer wants to add more
+ * @param eventID event where the wishes are added to
+ * @param userID the adding user
+ * @return {Promise<any>} will resolve on null or reject with the status code of the response to POST
+ */
+function dialog_createWishLoop(eventID, userID) {
+    return new Promise(function (resolve, reject) {
+        console.log("Enter the wishes you want to add to this event (Press ENTER on empty input to abort)");
+
+        let caseSwitch = "nameCase";
+        let name;
+        let location;
+
+        let wishes = {};
+        let wishCount = 0;
+        let run = true;
+
+        //Collect Users Wishes in JSON
+        while (run){
+            switch (caseSwitch){
+                case "nameCase":
+                    name =  readlineSync.question('name: ');
+                    if(name == ""){
+                        run = false;
+                        break;
+                    }
+                    caseSwitch = "locCase";
+                    break;
+                case "locCase":
+                    location =  readlineSync.question('location: ');
+                    if(location == ""){
+                        run = false;
+                        break;
+                    }
+
+                    //Add wish to JSON
+                    wishes[wishCount++] = {location, name};
+
+                    caseSwitch = "nameCase";
+                    break;
+            }
+        }
+
+        //POST all wishes in JSON
+        let sucCount = 0;
+        for(let w in wishes){
+            postWish(eventID,userID,wishes[w].name,wishes[w].location)
+                .then(function (res) {
+                    sucCount++;
+
+                    if(sucCount >= wishCount){ //Check if all wishes have been posted
+                        resolve();
+                    }
+                })
+                .catch(function (err) {
+                    reject(err);
+                })
+        }
+
+    });
+
 }
 
 /**
@@ -335,7 +407,7 @@ function createNewEventAndAddUsers() {
 
 }
 
-// --------------------------------------------- Helper Functions and Ressource operations from the Dienstnutzer
+//  Helper Functions and Ressource operations from the Dienstnutzer ---------------------------------------------
 
 /**
  * Cuts a URI (URL) at its last "/" and returns the following part of the string
@@ -367,6 +439,11 @@ function getUserShoppinglist(userID, eventID) {
         rp(options).then(function (allShoppingItems) {
             let myShoppingList = [];
             let arrayCounter = 0;
+
+            //Check if the List is Empty
+            if(Object.keys(allShoppingItems).length === 0){
+                resolve(null);
+            }
 
             for(let key in allShoppingItems){
                 let potentialUserId = uriToID(allShoppingItems[key].user);
@@ -481,15 +558,21 @@ function getWish(wishID, eventID) {
 /**
  * Post on the events /shoppinglist to create it with all wishes
  * @param eventID of the shoppinglist
+ * @returns Promise so you can wait for the POST to be successfully
  */
 function postShoppinglist(eventID) {
-    let options = {
-        method: 'POST',
-        uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
-        json: true, // Automatically stringifies the body to JSON
-        resolveWithFullResponse: true
-    };
-    rp(options);
+    return new Promise(function (resolve, reject) {
+        let options = {
+            method: 'POST',
+            uri :  DIENST_GEBER + '/events/' + eventID + '/shoppinglist',
+            json: true, // Automatically stringifies the body to JSON
+            resolveWithFullResponse: true
+        };
+
+        rp(options).then(function () {
+            resolve();
+        });
+    });
 }
 
 /**
@@ -555,34 +638,27 @@ function postEvent(eventName) {
 }
 
 /**
- * Adds multiple users to given event
- * @param userURIs JSON of User names that map to their URIs (Return of "postUsers")
+ * Adds a users to given event
+ * @param userID string that contains the ID of a user
  * @param eventID URI of Event
  * @returns {Promise<>} null
  */
-function postUsersToEvent(userURIs, eventID) {
+function postUserToEvent(userID, eventID) {
+    let json = {};
+    json.user = userID;
 
     let options = {
         method: 'POST',
         uri :  DIENST_GEBER + '/events/' + eventID + '/users',
-        json: true, // Automatically stringifies the body to JSON
+        json: true, // Automatically stringifies the body to JSON,
+        body: json,
         resolveWithFullResponse: true
     };
     return new Promise((resolve, reject) => {  //Build Promise
 
-        for (let key in userURIs){ //Iterate through all User names in req
-
-            let userName = key;
-            let userURI = userURIs[key];
-
-            options.body = {'user': uriToID(userURI)}; //Get Id of each User
-
-
-            rp(options);
-            console.log(options.body);
-
-        }
-        resolve();
+        rp(options).then(function (res) {
+            resolve();
+        });
     });
 }
 
@@ -592,6 +668,7 @@ function postUsersToEvent(userURIs, eventID) {
  * @param userID of the user that is logged in
  * @param name of the wish (e.g. water)
  * @param location of the shop where you can buy this wish (e.g. market)
+ * @returns {Promise<String>} when failed it returns the error
  */
 function postWish(eventID,userID,name,location) {
     //Build base Options
@@ -605,5 +682,44 @@ function postWish(eventID,userID,name,location) {
         json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true
     };
-    rp(options);
+    return new Promise((resolve, reject) => {  //Build Promise
+        rp(options)
+            .then(function () {
+                // POST success
+                resolve();
+            })
+            .catch(function (err) {
+                // POST fail
+                reject(err);
+            });
+    });
+}
+
+/**
+ * subscribes this client to the Faye Push Notifications of an event
+ * @param eventID
+ */
+function subscribeToEvent(eventID) {
+    let subscription = fayeClient.subscribe('/' +  eventID, function(message) {
+        console.log(chalk.green('\n*************************'));
+        console.log('The shoppinglist of event:\n' + chalk.blue(message.event) + "\nis now ready.");
+        console.log(chalk.green('*************************'));
+    });
+}
+
+/**
+ * Subscribes client that logged in to all the Faye Push Notification of all events user takes part in
+ * @param userID
+ * @return {Promise<null>}
+ */
+function subUserToAllCurrentEvents(userID) {
+    return new Promise(function (resolve, reject) {
+        getEventsOfUser(userID).then(function (res) {
+            for(let id in res){
+                cluster.fork({event : id});
+            }
+            resolve();
+        });
+    });
+
 }
