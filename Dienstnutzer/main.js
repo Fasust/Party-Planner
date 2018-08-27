@@ -12,8 +12,8 @@ const cluster = require('cluster');
 
 
 // switch of Dienstgeber path with option localhost or heroku
-//const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
-const DIENST_GEBER = 'http://localhost:3000';
+const DIENST_GEBER = 'https://wba2-2018.herokuapp.com';
+//const DIENST_GEBER = 'http://localhost:3000';
 
 //Init Faye
 let fayeClient = new faye.Client(DIENST_GEBER + '/faye', {timeout: 120});
@@ -24,14 +24,14 @@ fayeClient.connect();
  ************************************************************************/
 
 /**
- * In Our Projekt we have to main Processes Running at all Time:
- * One to handle the Synchones Input of th User. This is the the Dialoge Tree Through which a user can Navigate.
- * The Seconde one is to Handle The A-Sychones Push Notifications from our Faye Server.
- * At This Point Here the 2 Processes are split. We use te Mudule "Cluster" to make to Symultanioslyrunning Processes Possible.
- * When ever a new Faye-Subscribtion is opend, we slit of a new Process to handle the Notification for that specific event.
- * the Split-of-Process Arrives here at the Top of the Programm and enters into the "else" branch.
+ * In our project we have two main processes tunning all the time:
+ * First one to handle the synchones input of the user. This is the dialoge tree which a user can navigate through the program.
+ * The second one is to handle the asychronous Push Notifications from our Faye Server.
+ * At this point here the two processes are split. We use te module "Cluster" to make to symultaniously running processes possible.
+ * When ever a new Faye-Subscribtion is opened, we split of a new process to handle the notification for that specific event.
+ * the split-of-process arrives here at the top of the program and enters into the "else" case.
  */
-if(cluster.isMaster){
+if(cluster.isMaster) {
     console.log(
         chalk.magenta('-------------------------\n') +
         '- Welcome to the Worlds -\n' +
@@ -51,7 +51,7 @@ if(cluster.isMaster){
             break;
     }
 
-}else{
+} else {
     subscribeToEvent(process.env.event);
 }
 
@@ -242,7 +242,7 @@ function dialog_enterEvent(userID) {
             postUserToEvent(userID, eventID).then(function () {
                 console.log("User " + chalk.red(userID) + " has been added to event " + chalk.blue(eventID));
 
-                //Split of the Process for handling the Faye Subscribtion
+                // Split of the process for handling the Faye subscription
                 cluster.fork({event : eventID});
 
                 resolve();
@@ -281,10 +281,10 @@ function dialog_createWishes(userID) {
 }
 
 /**
- * Creates a Looping Dialog that keeps asking for wishes and will resolve when the user no longer wants to add more
+ * Creates a looping dialoge that keeps asking for wishes and will resolve, when the user no longer wants to add more
  * @param eventID event where the wishes are added to
  * @param userID the adding user
- * @return {Promise<any>} will resole on null or reject with the status code of the Response to POST
+ * @return {Promise<any>} will resolve on null or reject with the status code of the response to POST
  */
 function dialog_createWishLoop(eventID, userID) {
     return new Promise(function (resolve, reject) {
@@ -559,7 +559,7 @@ function getWish(wishID, eventID) {
 /**
  * Post on the events /shoppinglist to create it with all wishes
  * @param eventID of the shoppinglist
- * @returns Promise so you can wait for the POST to be successfull
+ * @returns Promise so you can wait for the POST to be successfully
  */
 function postShoppinglist(eventID) {
     return new Promise(function (resolve, reject) {
@@ -697,19 +697,19 @@ function postWish(eventID,userID,name,location) {
 }
 
 /**
- * subscribes this Client to the Faye Push Notifications of an Event
+ * subscribes this client to the Faye Push Notifications of an event
  * @param eventID
  */
 function subscribeToEvent(eventID) {
     let subscription = fayeClient.subscribe('/' +  eventID, function(message) {
         console.log(chalk.green('\n*************************'));
-        console.log('The Shoppinglist of Event:\n' + chalk.blue(message.event) + "\nis now Ready.");
+        console.log('The shoppinglist of event:\n' + chalk.blue(message.event) + "\nis now ready.");
         console.log(chalk.green('*************************'));
     });
 }
 
 /**
- * Subscribes this Client to all the Faye Push Notification of the Events a given user takes part in
+ * Subscribes client that logged in to all the Faye Push Notification of all events user takes part in
  * @param userID
  * @return {Promise<null>}
  */

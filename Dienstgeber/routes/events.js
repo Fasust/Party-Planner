@@ -10,20 +10,19 @@ const db = admin.firestore();
 const express = require("express");
 const router = express.Router(null);
 
-//Faye
+// Faye
 const faye = require('faye');
 
-//Own
+// Own
 const fsExtensions = require('../own_modules/firestoreExtensions');
 
 // Validation with JSON Schema
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 
-// loading JSON Schema File
+// loading JSON Schema file
 const fs = require("fs");
 const schema = JSON.parse(fs.readFileSync('./json_schema_wish.json','utf8'));
-
 
 // Init Route
 const ROUTE = "events";
@@ -160,7 +159,7 @@ router.get('/:eid/wishes/:wid', function (req, res) {
  */
 router.post('/:eid/wishes', function (req, res) {
 
-    // Validation - start-----------------------
+    // Error handler - start
     if(req.body == {}) {
         res.status(400).send('Missing Body in this POST!');
         return;
@@ -177,23 +176,25 @@ router.post('/:eid/wishes', function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    //JSON Schema
+    // Error handler - end
+
+    // JSON Schema Validation - start
     if ( v.validate(req.body, schema).errors.length > 0 ) {
         res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
         return;
     }
-    // Validation - end-------------------
+    // JSON Schema Validation - end
 
-    //Check if a shopping list has already been generated
+    // Check if a shoppinglist has already been generated
     db.collection('events').doc(req.params.eid).collection('shoppinglist').get().
     then(shop => {
         if (shop.docs.length > 0) {
 
-            //Shopping List exists
+            // shoppinglist exists
             res.status(423).send('Shoppinglist was already generated: No Longer Allowed to Submit Wishes.');
 
-        }else{
-            //Shopping List Dose Not exist
+        } else {
+            // shoppinglist does not exist
 
             // Getting return values
             let wish = req.body; //JSON in Body
@@ -240,7 +241,7 @@ router.put('/:eid/wishes/:wid' ,function (req, res) {
         res.status(400).send('Missing Variable in Body of this POST!');
         return;
     }
-    //JSON Schema
+    // JSON Schema
     if ( v.validate(req.body, schema).errors.length > 0 ) {
         res.status(400).send('JSON Schema Validation failed. Maybe location and name are not type String.');
         return;
@@ -481,7 +482,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                 let destribution = JSON.parse(JSON.stringify(userIDs)); //clone UserIDS
                 for (let key in destribution){
 
-                    // asinge every user ID a value of 0.
+                    // assign every user ID a value of 0.
                     // This will be the number of wishes ever user has  at a given Moment
                     destribution[key] = 0;
                 }
@@ -500,7 +501,7 @@ router.post('/:eid/shoppinglist', function (req, res) {
                         console.log("---------------------");
                         console.log("location: " + currentLocation);
 
-                        //find index of user with smalles amout of wishes
+                        //find index of user with smallest amount of wishes
                         let lowest = 2147483647;
                         for (let key in destribution){
 
