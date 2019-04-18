@@ -7,6 +7,11 @@ Die vier Freunde Anna, Basti, Christina und Daniel wollen eine Grillparty verans
 
 Jeder der Vier soll einen Teil besorgen und sie wollen sicherstellen, dass möglichst wenig unterschiedlichen Läden angefahren werden müssen. Dadurch würden z.B. höhere Spritkosten entstehen und es würde viel Zeit aufgewendet werden, um alle Produkte einzukaufen.
 
-![Party Planer Poster](Material/wba2_partyplaner_poster.jpg)
+## Infos
 
-**Die Dokumentation ist im [Wiki des Repositories](https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/wiki) zu finden.**
+Der Partyplaner hat in 2018 den [Preis](https://www.th-koeln.de/hochschule/innovativ-kreativ-multimedial_61452.php) “Bestes Projekt des Semesters” gewonnen.
+
+Die Dokumentation ist im [Wiki des Repositories](https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/wiki) zu finden.
+
+## Poster
+![Party Planer Poster](Material/wba2_partyplaner_poster.jpg)
