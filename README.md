@@ -7,9 +7,9 @@ Jeder der Vier soll einen Teil besorgen und sie wollen sicherstellen, dass mögl
 
 ## Infos
 
-Der Partyplaner hat in 2018 den [Preis](https://www.th-koeln.de/hochschule/innovativ-kreativ-multimedial_61452.php) “Bestes Projekt des Semesters” gewonnen.
-
-Die Dokumentation ist im [Wiki des Repositories](https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/wiki) zu finden.
+🏆 Der Partyplaner hat in 2018 den [Preis](https://www.th-koeln.de/hochschule/innovativ-kreativ-multimedial_61452.php) “Bestes Projekt des Semesters” gewonnen.
+ 
+📄 Die Dokumentation ist im [Wiki des Repositories](https://github.com/JulianSchoem/WBA2SS18FaustTissenSchoemaker/wiki) zu finden.
 
 ## Poster
 ![Party Planer Poster](Material/wba2_partyplaner_poster.jpg)
